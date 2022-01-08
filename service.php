@@ -19,4 +19,13 @@ class Service{
         }
         return $retval;
     }
+
+    public function GetAllWeeks(){
+        $result = $this->mysqli->query("SELECT DISTINCT week FROM work_days ORDER BY week");
+        return $result->fetch_array(MYSQLI_NUM);
+    }
+
+    public function GetThisWeekString(){
+
+    }
 }
