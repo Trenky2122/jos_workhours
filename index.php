@@ -21,6 +21,7 @@ if(isset($_GET["w"])){
     }
 }
 $days = $service->GetDaysInWeek($year, $week);
+echo json_encode($service->WorkerCorrectPassword(1, "aleluja"));
 ?>
 <table class="table table-stripped">
     <thead>
