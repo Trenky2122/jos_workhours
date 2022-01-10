@@ -28,11 +28,11 @@ class WorkDay{
 class WorkerWorkDay{
     public int $worker_id;
     public int $work_day_id;
-    public string $begin_time;
-    public string $end_time;
-    public string $break_begin;
-    public string $break_end;
-    public string $project;
-    public string $description;
+    public ?string $begin_time;
+    public ?string $end_time;
+    public ?string $break_begin;
+    public ?string $break_end;
+    public ?string $project;
+    public ?string $description;
     public bool $done;
 }

@@ -134,7 +134,7 @@ class Service
     }
 
     public function GetWorkerDefaultWithId($worker_id){
-        $stmt = $this->mysqli->prepare("SELECT * FROM default_days WHERE worker_id=?");
+        $stmt = $this->mysqli->prepare("SELECT * FROM default_days WHERE worker_id=? ORDER BY work_day_number ASC");
         $stmt->bind_param("i", $worker_id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -143,6 +143,14 @@ class Service
             array_push($retval, $row);
         }
         return $retval;
+    }
+
+    public function GetWorkerNameWithId($worker_id){
+        $stmt = $this->mysqli->prepare("SELECT name, surname FROM workers WHERE id=?");
+        $stmt->bind_param("i", $worker_id);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        return $result['name'] . ' ' . $result['surname'];
     }
 
     public function CreateOrUpdateDefaultForUser($worker_id, $workday_id, $begin_time, $end_time, $break_begin,
@@ -165,5 +173,21 @@ class Service
             $stmt->execute();
         }
         return $this->mysqli->connect_errno != 0;
+    }
+
+    public function SetWorkerDefaultToNull($worker_id, $day){
+        $sql = "SELECT * FROM default_days WHERE worker_id = $worker_id AND work_day_number = $day";
+        $result = $this->mysqli->query($sql);
+        if($result->num_rows > 0){
+            $sql = "UPDATE default_days SET work_day_number = $day, begin_time = null, end_time = null, break_begin = null, break_end = null, project = null, description = null";
+            $sql.= " WHERE worker_id = $worker_id AND work_day_number = $day";
+            $this->mysqli->query($sql);
+        }
+        else{
+            $sql = "INSERT INTO default_days (worker_id, work_day_number, begin_time, end_time, break_begin, break_end, project, description)";
+            $sql.= " VALUES ($worker_id, $day, null, null, null, null, null, null)";
+            $this->mysqli->query($sql);
+        }
+        return $this->mysqli->error;
     }
 }

@@ -10,6 +10,7 @@
             crossorigin="anonymous"></script>
 </head>
 <body>
+<script src="scripts.js" type="application/javascript"></script>
 <div class="container-fluid">
     <div class="row" style="background-color: #0132B9; color: #FFFFFF;">
         <div class="col-1">
