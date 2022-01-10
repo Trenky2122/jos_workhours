@@ -21,7 +21,7 @@ if(isset($_GET["w"])){
     }
 }
 $days = $service->GetDaysInWeek($year, $week);
-echo json_encode($service->WorkerCorrectPassword(1, "aleluja"));
+include "message_bar.php";
 ?>
 <table class="table table-stripped">
     <thead>
@@ -53,17 +53,17 @@ foreach ($workers as $worker){
         <tr class="<?= $day->day_of_week." ".$worker->id ?>">
             <td><?= $day->day_of_week?></td>
             <form method="post" action="submit_workday.php">
-                <input type="hidden" name="work_day_id" value="<?= $day->id?>">
-                <input type="hidden" name="worker_id" value="<?= $worker->id?>">
-                <td><input id="total_hrs_<?=$worker->id."_".$day->day_of_week ?>_begin_time" onchange="recalculateHours('total_hrs_<?=$worker->id."_".$day->day_of_week ?>')" type="time" step="300" name="begin_time"></td>
-                <td><input id="total_hrs_<?=$worker->id."_".$day->day_of_week ?>_end_time" onchange="recalculateHours('total_hrs_<?=$worker->id."_".$day->day_of_week ?>')" type="time" step="300" name="end_time"></td>
-                <td><input id="total_hrs_<?=$worker->id."_".$day->day_of_week ?>_break_begin" onchange="recalculateHours('total_hrs_<?=$worker->id."_".$day->day_of_week ?>')" type="time" step="300" name="break_begin"></td>
-                <td><input id="total_hrs_<?=$worker->id."_".$day->day_of_week ?>_break_end" onchange="recalculateHours('total_hrs_<?=$worker->id."_".$day->day_of_week ?>')" type="time" step="300" name="break_end"></td>
+                <input required type="hidden" name="work_day_id" value="<?= $day->id?>">
+                <input required type="hidden" name="worker_id" value="<?= $worker->id?>">
+                <td><input required id="total_hrs_<?=$worker->id."_".$day->day_of_week ?>_begin_time" onchange="recalculateHours('total_hrs_<?=$worker->id."_".$day->day_of_week ?>')" type="time" step="300" name="begin_time"></td>
+                <td><input required id="total_hrs_<?=$worker->id."_".$day->day_of_week ?>_end_time" onchange="recalculateHours('total_hrs_<?=$worker->id."_".$day->day_of_week ?>')" type="time" step="300" name="end_time"></td>
+                <td><input required id="total_hrs_<?=$worker->id."_".$day->day_of_week ?>_break_begin" onchange="recalculateHours('total_hrs_<?=$worker->id."_".$day->day_of_week ?>')" type="time" step="300" name="break_begin"></td>
+                <td><input required id="total_hrs_<?=$worker->id."_".$day->day_of_week ?>_break_end" onchange="recalculateHours('total_hrs_<?=$worker->id."_".$day->day_of_week ?>')" type="time" step="300" name="break_end"></td>
                 <td id="total_hrs_<?=$worker->id."_".$day->day_of_week ?>">0:00</td>
-                <td><textarea name="description"></textarea></td>
-                <td><input type="text" name="project"></td>
-                <td><input type="password" name="password"></td>
-                <td><input type="submit" class="btn btn-primary" value="Uložiť"></td>
+                <td required><textarea name="description"></textarea></td>
+                <td required><input type="text" name="project"></td>
+                <td required><input type="password" name="password"></td>
+                <td required><input type="submit" class="btn btn-primary" value="Uložiť"></td>
             </form>
         </tr>
     <?php
