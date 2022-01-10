@@ -99,10 +99,10 @@ include "message_bar.php";
                                            onchange="recalculateHours('total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>')"
                                            type="time" step="300" name="break_end"></td>
                                 <td id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>">0:00</td>
-                                <td required><textarea name="description"></textarea></td>
-                                <td required><input type="text" name="project"></td>
-                                <td required><input type="password" name="password"></td>
-                                <td required><input type="submit" class="btn btn-primary" value="Uložiť"></td>
+                                <td><textarea required name="description"></textarea></td>
+                                <td><input required type="text" name="project"></td>
+                                <td><input required type="password" name="password"></td>
+                                <td><input required type="submit" class="btn btn-primary" value="Uložiť"></td>
                             </form>
                         </tr>
                         <?php
