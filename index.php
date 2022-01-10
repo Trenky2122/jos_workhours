@@ -63,6 +63,7 @@ include "message_bar.php";
                     <th>Celkový čas</th>
                     <th>Náplň práce</th>
                     <th>Projekt</th>
+                    <th>Vykonane</th>
                     <th>Heslo</th>
                     <th></th>
                 </tr>
@@ -73,10 +74,13 @@ include "message_bar.php";
                 foreach ($workers as $worker) {
                     ?>
                     <tr class="table-row worker_<?= $worker->id ?> worker_name">
-                        <td colspan="8"><strong><?= $worker->GetFullName() ?></strong></td>
+                        <td><strong><?= $worker->GetFullName() ?></strong></td>
+                        <td><a href="default_change.php?id=<?= $worker->id ?>" class="btn btn-primary">upraviť default</a></td>
+                        <td colspan="8"><a href="" class="btn btn-primary"> zmeniť heslo</a></td>
                     </tr>
                     <?php
                     foreach ($days as $day) {
+                        $workerData = $service->GetWorkerWorkDay($worker->id, $day);
                         ?>
                         <tr class="<?= "day_" . $day->id . " worker_" . $worker->id ?> table-row">
                             <td><?= date("d.m.Y", strtotime($day->day)) ?></td>
@@ -86,21 +90,22 @@ include "message_bar.php";
                                 <td><input required
                                            id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_begin_time"
                                            onchange="recalculateHours('total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>')"
-                                           type="time" step="300" name="begin_time"></td>
+                                           type="time" step="300" name="begin_time" value="<?= $workerData->begin_time ?>"></td>
                                 <td><input required id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_end_time"
                                            onchange="recalculateHours('total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>')"
-                                           type="time" step="300" name="end_time"></td>
+                                           type="time" step="300" name="end_time" value="<?= $workerData->end_time ?>"></td>
                                 <td><input required
                                            id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_break_begin"
                                            onchange="recalculateHours('total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>')"
-                                           type="time" step="300" name="break_begin"></td>
+                                           type="time" step="300" name="break_begin" value="<?= $workerData->break_begin ?>"></td>
                                 <td><input required
                                            id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_break_end"
                                            onchange="recalculateHours('total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>')"
-                                           type="time" step="300" name="break_end"></td>
+                                           type="time" step="300" name="break_end" value="<?= $workerData->break_end ?>"></td>
                                 <td id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>">0:00</td>
-                                <td><textarea required name="description"></textarea></td>
-                                <td><input required type="text" name="project"></td>
+                                <td><textarea required name="description" value="<?= $workerData->description ?>"></textarea></td>
+                                <td><input required type="text" name="project" value="<?php if($workerData != null) echo($workerData->project);?>"></td>
+                                <td><input type="checkbox" name="done" disabled="<?= date("d.m.Y") >= date("d.m.Y", strtotime($day->day));?>" value="<?= $workerData->done ?>"></td>
                                 <td><input required type="password" name="password"></td>
                                 <td><input required type="submit" class="btn btn-primary" value="Uložiť"></td>
                             </form>
@@ -160,8 +165,10 @@ include "message_bar.php";
             if (document.getElementById("day_select").value != "0") {
                 className += " " + document.getElementById("day_select").value;
             }
-            if (className == "")
+            if (className == "") {
+                [].forEach.call(allRows, (element) => element.style.display = "table-row");
                 return;
+            }
             if(className.charAt(0)==" ")
                 className=className.substring(1);
             let elsToShow = document.getElementsByClassName(className);
