@@ -109,7 +109,10 @@ include "message_bar.php";
                                 <td><input required type="text" name="project" value="<?php if($workerData != null) echo($workerData->project);?>"></td>
                                 <td><input type="checkbox" name="done" <?php if(date("Y-m-d") < $day->day) echo "disabled" ?> <?php if($workerData->done)echo "checked" ?>></td>
                                 <td><input required type="password" name="password"></td>
-                                <td><input required type="submit" class="btn btn-primary" value="Uložiť"></td>
+                                <td id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>"><input required type="submit" class="btn btn-primary" value="Uložiť"></td>
+                                <script>
+                                    document.getElementById("total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>").addEventListener("load", recalculateHours("total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>"))
+                                </script>
                             </form>
                         </tr>
                         <?php

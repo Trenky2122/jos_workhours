@@ -12,6 +12,7 @@ function recalculateHours(element_id) {
     } else {
         document.getElementById(element_id).innerHTML = "0:00";
     }
+    console.log(element_id);
 }
 
 function calculateTimeDifference(time_begin, time_end) {

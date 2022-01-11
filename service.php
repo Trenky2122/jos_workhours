@@ -87,7 +87,7 @@ class Service
         }
         else{
             $stmt = $this->mysqli->prepare("INSERT INTO workers_workday (begin_time, end_time, break_begin,
-                           break_end, project, description, worker_id, work_day_id, done) VALUES (?,?,?,?,?,?,?,?)");
+                           break_end, project, description, worker_id, work_day_id, done) VALUES (?,?,?,?,?,?,?,?,?)");
             $stmt->bind_param("ssssssiii", $begin_time, $end_time, $break_begin, $break_end, $project,
                 $description, $worker_id, $workday_id, $done);
             $stmt->execute();
@@ -130,7 +130,21 @@ class Service
             $retval->done = false;
             return $retval;
         }
-        //throw new Exception("empty result");
+        throw new Exception("empty result");
+    }
+
+    public function GetDoneWorkerWorkDays($worker_id, $month, $year){
+        $sql = "SELECT w1.begin_time, w1.end_time, w1.break_begin, w1.break_end, w1.description, w1.project, w2.day FROM workers_workday w1 JOIN work_days w2 ON w1.work_day_id = w2.id";
+        $sql.= " WHERE w1.worker_id=? AND MONTH(w2.day)=? AND YEAR(w2.day)=? AND w1.done = 1";
+        $stmt = $this->mysqli->prepare( $sql);
+        $stmt->bind_param("iii", $worker_id, $month, $year);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $retval = array();
+        while($row = $result->fetch_assoc()){
+            $retval[$row['day']] = $row;
+        }
+        return $retval;
     }
 
     public function GetWorkerDefaultWithId($worker_id){
@@ -206,5 +220,22 @@ class Service
         if($stmt->affected_rows == 1)
             return true;
         return false;
+    }
+
+    public function CalculateTotalTime($begin_time, $end_time, $break_begin, $break_end){
+        if($begin_time == null || $end_time == null || $break_begin == null || $break_end == null)
+            return null;
+        $base = strtotime('00:00:00');
+        $begin_time = strtotime($begin_time) - $base;
+        $end_time = strtotime($end_time) - $base;
+        $break_begin = strtotime($break_begin) - $base;
+        $break_end = strtotime($break_end) - $base;
+        $totaltime = $end_time - $begin_time - ($break_end - $break_begin);
+        $h = intval($totaltime / 3600);
+        $totaltime = $totaltime - ($h * 3600);
+        $m = intval($totaltime / 60);
+        if($m == 0)
+            $m = "00";
+        return "$h:$m";
     }
 }
