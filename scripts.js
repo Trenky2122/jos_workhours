@@ -15,6 +15,8 @@ function recalculateHours(element_id) {
 }
 
 function calculateTimeDifference(time_begin, time_end) {
+    time_begin = time_begin.substring(0, 5);
+    time_end = time_end.substring(0, 5);
     console.log(arguments);
     let time_begin_min = time_begin.substring(3);
     let time_end_min = time_end.substring(3);

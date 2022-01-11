@@ -20,7 +20,6 @@ if (isset($_GET["w"])) {
 }
 $days = $service->GetDaysInWeek($year, $week);
 $workers = $service->GetAllWorkers();
-
 include "message_bar.php";
 ?>
     <div class="row mt-2">
@@ -104,9 +103,9 @@ include "message_bar.php";
                                            onchange="recalculateHours('total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>')"
                                            type="time" step="300" name="break_end" value="<?= $workerData->break_end ?>"></td>
                                 <td id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>">0:00</td>
-                                <td><textarea required name="description" value="<?= $workerData->description ?>"></textarea></td>
+                                <td><textarea required name="description"><?= $workerData->description ?></textarea></td>
                                 <td><input required type="text" name="project" value="<?php if($workerData != null) echo($workerData->project);?>"></td>
-                                <td><input type="checkbox" name="done" disabled="<?= date("d.m.Y") >= date("d.m.Y", strtotime($day->day));?>" value="<?= $workerData->done ?>"></td>
+                                <td><input type="checkbox" name="done" <?php if(date("Y-m-d") < $day->day) echo "disabled" ?> <?php if($workerData->done)echo "checked" ?>></td>
                                 <td><input required type="password" name="password"></td>
                                 <td><input required type="submit" class="btn btn-primary" value="Uložiť"></td>
                             </form>

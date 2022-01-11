@@ -18,6 +18,15 @@ if(isset($_GET["err"])){
         </div>
         <?php
     }
+    if($_GET["err"]==3){
+        ?>
+        <div class="row">
+            <div class="alert alert-danger" role="alert">
+                Nepodarilo sa uložiť do databázy.
+            </div>
+        </div>
+        <?php
+    }
 }
 if(isset($_GET["succ"])){
     if($_GET["succ"]==1){

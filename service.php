@@ -82,7 +82,7 @@ class Service
             $stmt = $this->mysqli->prepare("UPDATE workers_workday SET begin_time=?, end_time=?, break_begin=?,
                            break_end=?, project=?, description=?, done=? WHERE worker_id=? and work_day_id=?");
             $stmt->bind_param("ssssssiii", $begin_time, $end_time, $break_begin, $break_end, $project,
-                $description, $worker_id, $workday_id, $done);
+                $description, $done, $worker_id, $workday_id);
             $stmt->execute();
         }
         else{
@@ -92,7 +92,7 @@ class Service
                 $description, $worker_id, $workday_id, $done);
             $stmt->execute();
         }
-        return $this->mysqli->connect_errno != 0;
+        return $this->mysqli->connect_errno == 0;
     }
 
     public function GetWorkerWorkDay($worker_id, $workday){
