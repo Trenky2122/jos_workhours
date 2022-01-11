@@ -27,7 +27,17 @@ if(isset($_GET["err"])){
         </div>
         <?php
     }
+    if($_GET["err"]==4){
+        ?>
+        <div class="row">
+            <div class="alert alert-danger" role="alert">
+                Nové heslá sa nerovnajú.
+            </div>
+        </div>
+        <?php
+    }
 }
+
 if(isset($_GET["succ"])){
     if($_GET["succ"]==1){
         ?>

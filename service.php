@@ -153,26 +153,30 @@ class Service
         return $result['name'] . ' ' . $result['surname'];
     }
 
-    public function CreateOrUpdateDefaultForUser($worker_id, $workday_id, $begin_time, $end_time, $break_begin,
+    public function CreateOrUpdateDefaultForUser($worker_id, $workday_number, $begin_time, $end_time, $break_begin,
                                                  $break_end, $project, $description){
-        $stmt = $this->mysqli->prepare("SELECT * FROM default_days WHERE worker_id=? and work_day_id=?");
-        $stmt->bind_param("ii", $worker_id, $workday_id);
+        if($begin_time == "") $begin_time = null;
+        if($end_time == "") $end_time = null;
+        if($break_begin == "") $break_begin = null;
+        if($break_end == "") $break_end = null;
+        $stmt = $this->mysqli->prepare("SELECT * FROM default_days WHERE worker_id=? and work_day_number=?");
+        $stmt->bind_param("ii", $worker_id, $workday_number);
         $stmt->execute();
         if($stmt->get_result()->fetch_array()){
             $stmt = $this->mysqli->prepare("UPDATE default_days SET begin_time=?, end_time=?, break_begin=?,
-                           break_end=?, project=?, description=? WHERE worker_id=? and work_day_id=?");
+                           break_end=?, project=?, description=? WHERE worker_id=? and work_day_number=?");
             $stmt->bind_param("ssssssii", $begin_time, $end_time, $break_begin, $break_end, $project,
-                $description, $worker_id, $workday_id);
+                $description, $worker_id, $workday_number);
             $stmt->execute();
         }
         else{
             $stmt = $this->mysqli->prepare("INSERT INTO default_days (begin_time, end_time, break_begin,
-                           break_end, project, description, worker_id, work_day_id) VALUES (?,?,?,?,?,?,?,?)");
+                           break_end, project, description, worker_id, work_day_number) VALUES (?,?,?,?,?,?,?,?)");
             $stmt->bind_param("ssssssii", $begin_time, $end_time, $break_begin, $break_end, $project,
-                $description, $worker_id, $workday_id);
+                $description, $worker_id, $workday_number);
             $stmt->execute();
         }
-        return $this->mysqli->connect_errno != 0;
+        return $this->mysqli->error;
     }
 
     public function SetWorkerDefaultToNull($worker_id, $day){
@@ -189,5 +193,18 @@ class Service
             $this->mysqli->query($sql);
         }
         return $this->mysqli->error;
+    }
+
+    public function CompareNewPasswords($new_pass1, $new_pass2){
+        return $new_pass1 == $new_pass2;
+    }
+
+    public function UpdateWorkerPassword($worker_id, $new_password){
+        $stmt = $this->mysqli->prepare("UPDATE workers SET password_hash=MD5(?) WHERE id=?");
+        $stmt->bind_param("si", $new_password, $worker_id);
+        $stmt->execute();
+        if($stmt->affected_rows == 1)
+            return true;
+        return false;
     }
 }

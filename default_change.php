@@ -43,6 +43,7 @@ $worker_name = $service->GetWorkerNameWithId($worker_id);
                             <tr>
                                 <form method="post" action="submit_default.php">
                                     <input required type="hidden" name="worker_id" value="<?= $worker_id ?>">
+                                    <input required type="hidden" name="workday_number", value="<?= $row["work_day_number"] ?>">
                                     <td><?= $days_of_week[$row["work_day_number"]] ?></td>
                                     <td>
                                         <input id="total_hrs_<?= $row['id']?>_begin_time" onchange="recalculateHours('total_hrs_<?= $row['id']?>')"

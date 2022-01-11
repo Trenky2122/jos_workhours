@@ -3,6 +3,7 @@ include "header.php";
 include "service.php";
 $service = new Service();
 $year = date("Y");
+$month = date("m");
 if (isset($_GET["y"])) {
     if (is_numeric($_GET["y"])) {
         $year = $_GET["y"];
@@ -76,7 +77,8 @@ include "message_bar.php";
                     <tr class="table-row worker_<?= $worker->id ?> worker_name">
                         <td><strong><?= $worker->GetFullName() ?></strong></td>
                         <td><a href="default_change.php?id=<?= $worker->id ?>" class="btn btn-primary">upraviť default</a></td>
-                        <td colspan="8"><a href="" class="btn btn-primary"> zmeniť heslo</a></td>
+                        <td><a href="password_change.php?id=<?= $worker->id ?>" class="btn btn-primary"> zmeniť heslo</a></td>
+                        <td colspan="8"><a href="month_view.php?id=<?= $worker->id ?>&m=<?= $month?>&y=<?=$year?>" class="btn btn-primary">mesačný prehľad</a></td>
                     </tr>
                     <?php
                     foreach ($days as $day) {
