@@ -222,7 +222,7 @@ class Service
         return false;
     }
 
-    public function CalculateTotalTime($begin_time, $end_time, $break_begin, $break_end){
+    public function CalculateDayTime($begin_time, $end_time, $break_begin, $break_end){
         if($begin_time == null || $end_time == null || $break_begin == null || $break_end == null)
             return null;
         $base = strtotime('00:00:00');
@@ -237,5 +237,18 @@ class Service
         if($m == 0)
             $m = "00";
         return "$h:$m";
+    }
+
+    public function CalculateTotaltime($time){
+        $total = 0;
+        foreach ($time as $t){
+            if($t == null)
+                continue;
+            $arr = explode(':', $t);
+            $total += (int)$arr[0] * 60 + (int)$arr[1];
+        }
+        $min = $total % 60;
+        $hrs = floor($total / 60);
+        return "$hrs:$min";
     }
 }

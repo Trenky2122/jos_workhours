@@ -4,27 +4,26 @@ include "service.php";
 $service = new Service();
 $year = date("Y");
 $month = date("m");
-if (isset($_GET["y"])) {
-    if (is_numeric($_GET["y"])) {
-        $year = $_GET["y"];
-    } else {
-        die("Bad format year: " . $_GET["y"]);
-    }
-}
 $week = date("W");
-if (isset($_GET["w"])) {
-    if (is_numeric($_GET["w"])) {
-        $week = $_GET["w"];
-    } else {
+
+if(isset($_GET['w'])){
+    $arr = explode("-W", $_GET['w']);
+    if(!isset($arr[1]) || !isset($arr[0])){
         die("Bad format week: " . $_GET["w"]);
     }
+    if(!is_numeric($arr[0]) || !is_numeric($arr[1])){
+        die("Bad format week: " . $_GET["w"]);
+    }
+    $week = $arr[1];
+    $year = $arr[0];
 }
+
 $days = $service->GetDaysInWeek($year, $week);
 $workers = $service->GetAllWorkers();
 include "message_bar.php";
 ?>
     <div class="row mt-2">
-        <div class="col-6">
+        <div class="col-3">
             <label for="worker_select">Filter zamestnanec</label>
             <select id="worker_select" onchange="reloadFilter()">
                 <option value="0">Všetci</option>
@@ -37,7 +36,7 @@ include "message_bar.php";
                 ?>
             </select>
         </div>
-        <div class="col-6">
+        <div class="col-3">
             <label for="day_select">Filter deň</label>
             <select id="day_select" onchange="reloadFilter()">
                 <option value="0">Celý týždeň</option>
@@ -49,6 +48,13 @@ include "message_bar.php";
                 }
                 ?>
             </select>
+        </div>
+        <div class="col-3">
+            <form method="get" action="index.php">
+                <label>Týždeň</label>
+                <input type="week" id="week" name="w">
+                <input type="submit" name="submit" value="Hľadať">
+            </form>
         </div>
     </div>
     <div class="row">
@@ -78,7 +84,7 @@ include "message_bar.php";
                         <td><strong><?= $worker->GetFullName() ?></strong></td>
                         <td><a href="default_change.php?id=<?= $worker->id ?>" class="btn btn-primary">upraviť default</a></td>
                         <td><a href="password_change.php?id=<?= $worker->id ?>" class="btn btn-primary"> zmeniť heslo</a></td>
-                        <td colspan="8"><a href="month_view.php?id=<?= $worker->id ?>&m=<?= $month?>&y=<?=$year?>" class="btn btn-primary">mesačný prehľad</a></td>
+                        <td colspan="8"><a href="month_view.php?id=<?= $worker->id ?>&m=<?=$year?>-<?=$month?>" class="btn btn-primary">mesačný prehľad</a></td>
                     </tr>
                     <?php
                     foreach ($days as $day) {
