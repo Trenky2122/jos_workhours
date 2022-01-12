@@ -20,17 +20,15 @@ for($i=$start_time; $i<$end_time; $i+=86400)
 $done_days = $service->GetDoneWorkerWorkDays($worker_id, $month, $year);
 $total_time = array();
 ?>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.6/jspdf.plugin.autotable.min.js"></script>
 
-    <div class="row" style="margin-top: 1em">
+    <div class="row noprint" style="margin-top: 1em">
         <div class="col-1">
             <a href="index.php" class="btn btn-primary"> späť</a>
         </div>
         <div class="col-3">
             <form method="get" action="month_view.php">
                 <input type="hidden" name="id" value="<?=$worker_id?>">
-                <lable for="month">mesiac/rok:</lable>
+                <label for="month">mesiac/rok:</label>
                 <input type="month" id="month" name="m">
                 <input type="submit" name="submit" value="Hľadať">
             </form>
@@ -38,29 +36,29 @@ $total_time = array();
     </div>
 
     <div class="row">
-        <div class="col-10">
-            <table id="table_<?=$worker_id?>_<?=$year?>/<?=$month?>">
+        <div class="col-12">
+            <table id="example" style="width: ">
                 <thead>
                     <tr>
                         <td colspan="6" rowspan="3">Mesiac: <?= $month ?>/<?= $year ?></td>
-                        <td colspan="4">Pracovný čas</td>
+                        <td colspan="3">Pracovný čas</td>
                     </tr>
                     <tr>
-                        <td colspan="4">Firma: JOS GROUP s.r.o.</td>
+                        <td colspan="3">Firma: JOS GROUP s.r.o.</td>
                     </tr>
                     <tr>
-                        <td colspan="4">Zamestnanec: <?= $worker_name ?></td>
+                        <td colspan="3">Zamestnanec: <?= $worker_name ?></td>
                     </tr>
                     <tr>
-                        <th class="sun">Mesiac</th>
-                        <th class="sun">Deň</th>
-                        <th class="sun">Začiatočný čas</th>
-                        <th class="sun">Konečný čas</th>
-                        <th class="sun">Začiatok pauzy</th>
-                        <th class="sun">Koniec pauzy</th>
-                        <th class="sun">Celkový čas</th>
-                        <th class="sun">Náplň práce</th>
-                        <th class="sun">Projekt</th>
+                        <th scope="col" class="sun">Mesiac</th>
+                        <th scope="col" class="sun">Deň</th>
+                        <th scope="col" class="sun">Začiatočný čas</th>
+                        <th scope="col" class="sun">Konečný čas</th>
+                        <th scope="col" class="sun">Začiatok pauzy</th>
+                        <th scope="col" class="sun">Koniec pauzy</th>
+                        <th scope="col" class="sun">Celkový čas</th>
+                        <th scope="col" class="sun">Náplň práce</th>
+                        <th scope="col" class="sun">Projekt</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -104,37 +102,22 @@ $total_time = array();
                         <td><strong><?=$service->CalculateTotaltime($total_time)?></strong></td>
                         <td colspan="2"></td>
                     </tr>
-                    <tr></tr>
                     <tr>
-                        <td colspan="7" style='border: none;'></td>
-                        <td colspan="2" style='border: none;'>Podpis zamestnanca</td>
+                        <td colspan="3" style='border: none;'>Dátum: <?=$list_of_dates[count($list_of_dates) - 1][0]?></td>
+                        <td colspan="3" style='border: none;'>Podpis zamestnanca</td>
+                        <td colspan="3" style='border: none;'>Pečiatka a podpis zamestnávateľa</td>
                     </tr>
-                    <tr>
-                        <td style='border: none;'>Dátum: <?=$list_of_dates[count($list_of_dates) - 1][0]?></td>
-                    </tr>
-                    <?php
-                        for($i = 0; $i < 5; $i++){
-                            echo("<tr><td style='border: none; height: 20px;'></td></tr>");
-                        }
-                    ?>
-                    <tr>
-                        <td colspan="7" style='border: none;'></td>
-                        <td colspan="2" style='border: none;'>Pečiatka a podpis zamestnávateľa</td>
-                    </tr>
-                    <?php
-                    for($i = 0; $i < 5; $i++){
-                        echo("<tr><td style='border: none; height: 30px;'></td></tr>");
-                    }
-                    ?>
+                    <tr><td colspan="9" style="border: none; padding: 20px;"></td></tr>
                 </tbody>
             </table>
         </div>
     </div>
-    <div class="row">
+    <div class="row noprint">
         <div class="col-1">
-            <button class="btn btn-primary" onclick='generate("table_<?=$worker_id?>_<?=$year?>/<?=$month?>")'>Export</button>
+            <button class="btn btn-primary" id="pdf" onclick="window.print()">Export</button>
         </div>
     </div>
+
 
     <style>
         div{
@@ -142,13 +125,14 @@ $total_time = array();
         }
 
         th, td{
-            padding: 7px;
+            padding: 5px;
             text-align: left;
             border: 1px solid black;
         }
 
         table{
             border: solid black;
+            font-size: small;
         }
 
         .sun{
@@ -157,6 +141,20 @@ $total_time = array();
 
         .ord{
             border-bottom: 1px solid black;
+        }
+
+        @media print{
+            th, td{
+                padding: 1px;
+            }
+            table{
+                border: solid black;
+                font-size: 8px;
+                margin-top: -50px;
+            }
+            .noprint {
+                visibility: hidden;
+            }
         }
     </style>
 
