@@ -18,7 +18,7 @@ class Week{
 }
 
 class WorkDay{
-    public int $id;
+    public string $id;
     public string $day;
     public string $week;
     public string $month;

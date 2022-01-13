@@ -20,6 +20,7 @@ if(isset($_GET['w'])){
 
 $days = $service->GetDaysInWeek($year, $week);
 $workers = $service->GetAllWorkers();
+
 include "message_bar.php";
 ?>
     <div class="row mt-2">
@@ -43,7 +44,7 @@ include "message_bar.php";
                 <?php
                 foreach ($days as $day) {
                     ?>
-                    <option value="<?= "day_" . $day->id ?>"><?= $day->day_of_week . " " . date("d.m.Y", strtotime($day->day)) ?></option>
+                    <option value="<?= "day_" . $day->id ?>"><?= $day->day_of_week . " " . date("d.m.Y", strtotime($day->id)) ?></option>
                     <?php
                 }
                 ?>
@@ -91,7 +92,7 @@ include "message_bar.php";
                         $workerData = $service->GetWorkerWorkDay($worker->id, $day);
                         ?>
                         <tr class="<?= "day_" . $day->id . " worker_" . $worker->id ?> table-row">
-                            <td><?= date("d.m.Y", strtotime($day->day)) ?></td>
+                            <td><?= date("d.m.Y", strtotime($day->id)) ?></td>
                             <form method="post" action="submit_workday.php">
                                 <input required type="hidden" name="work_day_id" value="<?= $day->id ?>">
                                 <input required type="hidden" name="worker_id" value="<?= $worker->id ?>">
@@ -102,18 +103,18 @@ include "message_bar.php";
                                 <td><input required id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_end_time"
                                            onchange="recalculateHours('total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>')"
                                            type="time" step="300" name="end_time" value="<?= $workerData->end_time ?>"></td>
-                                <td><input required
+                                <td><input
                                            id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_break_begin"
                                            onchange="recalculateHours('total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>')"
                                            type="time" step="300" name="break_begin" value="<?= $workerData->break_begin ?>"></td>
-                                <td><input required
+                                <td><input
                                            id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_break_end"
                                            onchange="recalculateHours('total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>')"
                                            type="time" step="300" name="break_end" value="<?= $workerData->break_end ?>"></td>
                                 <td id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>">0:00</td>
                                 <td><textarea required name="description"><?= $workerData->description ?></textarea></td>
                                 <td><input required type="text" name="project" value="<?php if($workerData != null) echo($workerData->project);?>"></td>
-                                <td><input type="checkbox" name="done" <?php if(date("Y-m-d") < $day->day) echo "disabled" ?> <?php if($workerData->done)echo "checked" ?>></td>
+                                <td><input type="checkbox" name="done" <?php if(date("Y-m-d") < $day->id) echo "disabled" ?> <?php if($workerData->done)echo "checked" ?>></td>
                                 <td><input required type="password" name="password"></td>
                                 <td id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>"><input required type="submit" class="btn btn-primary" value="Uložiť"></td>
                                 <script>
