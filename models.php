@@ -26,6 +26,7 @@ class WorkDay{
 }
 
 class WorkerWorkDay{
+    public int $id;
     public int $worker_id;
     public int $work_day_id;
     public ?string $begin_time;
@@ -35,4 +36,11 @@ class WorkerWorkDay{
     public ?string $project;
     public ?string $description;
     public bool $done;
+}
+
+class Project{
+    public int $id;
+    public string $name;
+    public bool $active;
+    public ?string $time;
 }

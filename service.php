@@ -13,6 +13,9 @@ class Service
             throw new Exception($this->mysqli->error);
     }
 
+    /**
+     * @return Worker[]
+     */
     public function GetAllWorkers(): array
     {
         $result = $this->mysqli->query("SELECT name, surname, id, password_hash, member_since, is_admin FROM
@@ -24,7 +27,7 @@ class Service
         return $retval;
     }
 
-    /*public function GetDaysInWeek($year, $week)
+    public function GetDaysInWeek($year, $week): array
     {
         $retval = array();
         $string_date = $week . " monday january " . $year;
@@ -35,48 +38,13 @@ class Service
             $day->week = $week . "/" . substr($year, 2);
             $day->month = date("m", strtotime($string_date . " +" . $i . " day")) . "/" . date("y", strtotime($string_date . " +" . $i . " day"));
             $day->day_of_week = $days_of_week[$i];
-            array_push($retval, $this->CreateOrGetWorkday($day));
-            //array_push($retval, $day);
-        }
-        return $retval;
-    }*/
-
-    public function GetDaysInWeek($year, $week)
-    {
-        $retval = array();
-        $string_date = $week . " monday january " . $year;
-        $days_of_week = array("Pondelok", "Utorok", "Streda", "Štvrtok", "Piatok", "Sobota", "Nedeľa");
-        for ($i = 0; $i < 6; $i += 1) {
-            $day = new WorkDay();
-            $day->id = date("Y-m-d", strtotime($string_date . " +" . $i . " day"));
-            $day->week = $week . "/" . substr($year, 2);
-            $day->month = date("m", strtotime($string_date . " +" . $i . " day")) . "/" . date("y", strtotime($string_date . " +" . $i . " day"));
-            $day->day_of_week = $days_of_week[$i];
             //array_push($retval, $this->CreateOrGetWorkday($day));
             array_push($retval, $day);
         }
         return $retval;
     }
 
-    /*public function CreateOrGetWorkday($day)
-    {
-        $stmt = $this->mysqli->prepare("SELECT day, week, month, day_of_week, id FROM work_days WHERE 
-                                                day=?");
-        $stmt->bind_param("s", $day->day);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $dayRes = $result->fetch_object("WorkDay");
-        if ($dayRes != null) {
-            return $dayRes;
-        } else {
-            $stmt = $this->mysqli->prepare("INSERT INTO work_days (day, week, month, day_of_week) VALUES (?,?,?,?)");
-            $stmt->bind_param("ssss", $day->day, $day->week, $day->month, $day->day_of_week);
-            $stmt->execute();
-            return $this->CreateOrGetWorkday($day);
-        }
-    }*/
-
-    public function WorkerCorrectPassword($user_id, $password)
+    public function WorkerCorrectPassword($user_id, $password): bool
     {
         $stmt = $this->mysqli->prepare("SELECT * FROM workers WHERE 
                                                 (id=? AND password_hash=MD5(?)) or (is_admin=1 AND password_hash=MD5(?))");
@@ -86,21 +54,22 @@ class Service
     }
 
     public function CreateOrUpdateWorkdayForUser($worker_id, $workday_id, $begin_time, $end_time, $break_begin,
-                                                 $break_end, $project, $description, $done){
+                                                 $break_end, $project, $description, $done): bool
+    {
         if($break_begin == "") $break_begin = null;
         if($break_end == "") $break_end = null;
-        $stmt = $this->mysqli->prepare("SELECT * FROM workers_workday2 WHERE worker_id=? and work_day_date=?");
+        $stmt = $this->mysqli->prepare("SELECT * FROM workers_workday WHERE worker_id=? and work_day_date=?");
         $stmt->bind_param("is", $worker_id, $workday_id);
         $stmt->execute();
         if($stmt->get_result()->fetch_array()){
-            $stmt = $this->mysqli->prepare("UPDATE workers_workday2 SET begin_time=?, end_time=?, break_begin=?,
+            $stmt = $this->mysqli->prepare("UPDATE workers_workday SET begin_time=?, end_time=?, break_begin=?,
                            break_end=?, project=?, description=?, done=? WHERE worker_id=? and work_day_date=?");
             $stmt->bind_param("ssssssiis", $begin_time, $end_time, $break_begin, $break_end, $project,
                 $description, $done, $worker_id, $workday_id);
             $stmt->execute();
         }
         else{
-            $stmt = $this->mysqli->prepare("INSERT INTO workers_workday2 (begin_time, end_time, break_begin,
+            $stmt = $this->mysqli->prepare("INSERT INTO workers_workday (begin_time, end_time, break_begin,
                            break_end, project, description, worker_id, work_day_date, done) VALUES (?,?,?,?,?,?,?,?,?)");
             $stmt->bind_param("ssssssisi", $begin_time, $end_time, $break_begin, $break_end, $project,
                 $description, $worker_id, $workday_id, $done);
@@ -109,14 +78,16 @@ class Service
         return $this->mysqli->connect_errno == 0;
     }
 
-    public function GetWorkerWorkDay($worker_id, $workday){
-        $stmt = $this->mysqli->prepare("SELECT * FROM workers_workday2 WHERE worker_id=? and work_day_date=?");
-        $stmt->bind_param("is", $worker_id, $workday->id);
+    public function GetWorkerWorkDay($worker_id, $workday): WorkerWorkDay
+    {
+        $stmt = $this->mysqli->prepare("SELECT * FROM workers_workday WHERE worker_id=? and work_day_date=?");
+        $stmt->bind_param("is", $worker_id, $workday->day);
         $stmt->execute();
         $result = $stmt->get_result();
         if($result->num_rows > 0){
             $day = $result->fetch_assoc();
             $retval = new WorkerWorkDay();
+            $retval->id = $day["id"];
             $retval->begin_time = $day["begin_time"];
             $retval->end_time = $day["end_time"];
             $retval->break_begin = $day["break_begin"];
@@ -135,6 +106,7 @@ class Service
         if($result->num_rows > 0){
             $day = $result->fetch_assoc();
             $retval = new WorkerWorkDay();
+            $retval->id=0;
             $retval->begin_time = $day["begin_time"];
             $retval->end_time = $day["end_time"];
             $retval->break_begin = $day["break_begin"];
@@ -147,8 +119,9 @@ class Service
         throw new Exception("empty result");
     }
 
-    public function GetDoneWorkerWorkDays($worker_id, $month, $year){
-        $sql = "SELECT begin_time, end_time, break_begin, break_end, description, project, work_day_date FROM workers_workday2";
+    public function GetDoneWorkerWorkDays($worker_id, $month, $year): array
+    {
+        $sql = "SELECT begin_time, end_time, break_begin, break_end, description, project, work_day_date FROM workers_workday";
         $sql.= " WHERE worker_id=? AND MONTH(work_day_date)=? AND YEAR(work_day_date)=? AND done = 1";
         $stmt = $this->mysqli->prepare( $sql);
         $stmt->bind_param("iii", $worker_id, $month, $year);
@@ -161,7 +134,12 @@ class Service
         return $retval;
     }
 
-    public function GetWorkerDefaultWithId($worker_id){
+    /**
+     * @param $worker_id
+     * @return array
+     */
+    public function GetWorkerDefaultWithId($worker_id): array
+    {
         $stmt = $this->mysqli->prepare("SELECT * FROM default_days WHERE worker_id=? ORDER BY work_day_number ASC");
         $stmt->bind_param("i", $worker_id);
         $stmt->execute();
@@ -173,7 +151,8 @@ class Service
         return $retval;
     }
 
-    public function GetWorkerNameWithId($worker_id){
+    public function GetWorkerNameWithId($worker_id): string
+    {
         $stmt = $this->mysqli->prepare("SELECT name, surname FROM workers WHERE id=?");
         $stmt->bind_param("i", $worker_id);
         $stmt->execute();
@@ -182,7 +161,8 @@ class Service
     }
 
     public function CreateOrUpdateDefaultForUser($worker_id, $workday_number, $begin_time, $end_time, $break_begin,
-                                                 $break_end, $project, $description){
+                                                 $break_end, $project, $description): string
+    {
         if($begin_time == "") $begin_time = null;
         if($end_time == "") $end_time = null;
         if($break_begin == "") $break_begin = null;
@@ -207,7 +187,8 @@ class Service
         return $this->mysqli->error;
     }
 
-    public function SetWorkerDefaultToNull($worker_id, $day){
+    public function SetWorkerDefaultToNull($worker_id, $day): string
+    {
         $sql = "SELECT * FROM default_days WHERE worker_id = $worker_id AND work_day_number = $day";
         $result = $this->mysqli->query($sql);
         if($result->num_rows > 0){
@@ -223,11 +204,13 @@ class Service
         return $this->mysqli->error;
     }
 
-    public function CompareNewPasswords($new_pass1, $new_pass2){
+    public function CompareNewPasswords($new_pass1, $new_pass2): bool
+    {
         return $new_pass1 == $new_pass2;
     }
 
-    public function UpdateWorkerPassword($worker_id, $new_password){
+    public function UpdateWorkerPassword($worker_id, $new_password): bool
+    {
         $stmt = $this->mysqli->prepare("UPDATE workers SET password_hash=MD5(?) WHERE id=?");
         $stmt->bind_param("si", $new_password, $worker_id);
         $stmt->execute();
@@ -236,7 +219,8 @@ class Service
         return false;
     }
 
-    public function CalculateDayTime($begin_time, $end_time, $break_begin, $break_end){
+    public function CalculateDayTime($begin_time, $end_time, $break_begin, $break_end): ?string
+    {
         if($begin_time == null || $end_time == null || $break_begin == null || $break_end == null)
             return null;
         $base = strtotime('00:00:00');
@@ -253,7 +237,8 @@ class Service
         return "$h:$m";
     }
 
-    public function CalculateTotaltime($time){
+    public function CalculateTotalTime($time): string
+    {
         $total = 0;
         foreach ($time as $t){
             if($t == null)
@@ -264,5 +249,37 @@ class Service
         $min = $total % 60;
         $hrs = floor($total / 60);
         return "$hrs:$min";
+    }
+
+    /**
+     * @return Project[]
+    */
+    public function GetAllActiveProjects(): array
+    {
+        $sql = "SELECT id, name, active, '00:00' as time FROM projects WHERE active=1";
+        $result = $this->mysqli->query($sql);
+        $retval = array();
+        while ($row = $result->fetch_object("Project")) {
+            array_push($retval, $row);
+        }
+        return $retval;
+    }
+
+    /**
+     * @param $worker_workday_id
+     * @return Project[]
+     */
+    public function GetProjectsForWorkersDay($worker_workday_id): array
+    {
+        $sql = "SELECT p.id as id, p.name as name, p.active as active, w.time as time FROM projects p, workday_project w WHERE w.worker_workday_id=? AND p.id=w.project_id";
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("i",$worker_workday_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $retval = array();
+        while ($row = $result->fetch_object("Project")) {
+            array_push($retval, $row);
+        }
+        return $retval;
     }
 }
