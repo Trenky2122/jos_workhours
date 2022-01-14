@@ -20,7 +20,6 @@ if (isset($_GET['w'])) {
 
 $days = $service->GetDaysInWeek($year, $week);
 $workers = $service->GetAllWorkers();
-echo json_encode($service->TimeIs0("0:00"));
 include "message_bar.php";
 ?>
     <div class="row mt-2">
@@ -93,7 +92,8 @@ include "message_bar.php";
                         <td><strong><?= $worker->GetFullName() ?></strong></td>
                         <td colspan="2"><a href="default_change.php?id=<?= $worker->id ?>" class="btn btn-primary">upraviť
                                 default</a></td>
-                        <td colspan="2"><a href="password_change.php?id=<?= $worker->id ?>" class="btn btn-primary"> zmeniť
+                        <td colspan="2"><a href="password_change.php?id=<?= $worker->id ?>" class="btn btn-primary">
+                                zmeniť
                                 heslo</a></td>
                         <td colspan="6"><a href="month_view.php?id=<?= $worker->id ?>&m=<?= $year ?>-<?= $month ?>"
                                            class="btn btn-primary">mesačný prehľad</a></td>
@@ -101,6 +101,7 @@ include "message_bar.php";
                     <?php
                     foreach ($days as $day) {
                         $workerData = $service->GetWorkerWorkDay($worker->id, $day);
+                        $projectData = $service->GetProjectDataForWorkday($workerData->id);
                         ?>
                         <tr class="<?= "day_" . $day->day . " worker_" . $worker->id ?> table-row">
                             <td><?= date("d.m.Y", strtotime($day->day)) ?></td>
@@ -130,18 +131,31 @@ include "message_bar.php";
                                 <td><textarea required name="description"><?= $workerData->description ?></textarea>
                                 </td>
                                 <td>
-                                    <a class="btn btn-primary" data-toggle="collapse" href="#project_<?= $worker->id . "_" . $day->day_of_week ?>" role="button" aria-expanded="false" aria-controls="project_<?= $worker->id . "_" . $day->day_of_week ?>">
+                                    <a class="btn btn-primary" data-toggle="collapse"
+                                       href="#project_<?= $worker->id . "_" . $day->day_of_week ?>" role="button"
+                                       aria-expanded="false"
+                                       aria-controls="project_<?= $worker->id . "_" . $day->day_of_week ?>">
                                         Rozbaliť projekty
                                     </a>
                                     <div class="collapse" id="project_<?= $worker->id . "_" . $day->day_of_week ?>">
-                                        <?php $projects = $service->GetRelevantProjectsForDay($workerData->id);
-                                        foreach ($projects as $project){
+                                        <div class="container-fluid">
+                                            <?php $projects = $service->GetRelevantProjectsForDay($workerData->id);
+                                            foreach ($projects as $project) {
+                                                ?>
+                                                <div class="row">
+                                                    <div class="col-4">
+                                                        <label for="project_<?= $worker->id . "_" . $day->day_of_week . "_" . $project->id ?>"><?= $project->name ?></label>
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <input type="time" name="projects[<?= $project->id ?>]"
+                                                               id="project_<?= $worker->id . "_" . $day->day_of_week . "_" . $project->id ?>"
+                                                               value="<?= $projectData[$project->id] ?? "00:00:00" ?>">
+                                                    </div>
+                                                </div>
+                                                <?php
+                                            }
                                             ?>
-                                            <label for="project_<?= $worker->id . "_" . $day->day_of_week . "_" . $project->id?>"><?=$project->name?></label>
-                                            <input type="time" name="projects[<?=$project->id?>]" id="project_<?= $worker->id . "_" . $day->day_of_week . "_" . $project->id?>">
-                                            <?php
-                                        }
-                                        ?>
+                                        </div>
                                     </div>
                                 </td>
                                 <td><input type="checkbox"

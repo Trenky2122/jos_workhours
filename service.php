@@ -62,7 +62,7 @@ class Service
         $stmt = $this->mysqli->prepare("SELECT id FROM workers_workday WHERE worker_id=? and work_day_date=?");
         $stmt->bind_param("is", $worker_id, $workday_date);
         $stmt->execute();
-        if($worker_workday_id = $stmt->get_result()->fetch_column()){
+        if($worker_workday_id = $stmt->get_result()->fetch_field()){
             $stmt = $this->mysqli->prepare("UPDATE workers_workday SET begin_time=?, end_time=?, break_begin=?,
                            break_end=?, description=?, done=? WHERE worker_id=? and work_day_date=?");
             $stmt->bind_param("sssssiis", $begin_time, $end_time, $break_begin, $break_end,
@@ -345,5 +345,19 @@ WHERE w.worker_workday_id=? AND p.id=w.project_id";
             }
         }
         return true;
+    }
+
+    public function GetProjectDataForWorkday($worker_workday_id){
+        if($worker_workday_id == 0)
+            return array();
+        $stmt = $this->mysqli->prepare("SELECT * FROM workday_project WHERE worker_workday_id=?");
+        $stmt->bind_param("i", $worker_workday_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $retval = array();
+        while ($row = $result->fetch_assoc()){
+            $retval[$row["project_id"]]=$row["time"];
+        }
+        return $retval;
     }
 }
