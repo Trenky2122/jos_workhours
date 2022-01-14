@@ -33,7 +33,7 @@ class WorkerWorkDay{
     public ?string $end_time;
     public ?string $break_begin;
     public ?string $break_end;
-    public ?string $project;
+    public array $projects;
     public ?string $description;
     public bool $done;
 }

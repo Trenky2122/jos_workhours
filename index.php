@@ -129,16 +129,19 @@ include "message_bar.php";
                                 <td><textarea required name="description"><?= $workerData->description ?></textarea>
                                 </td>
                                 <td>
-                                    <a class="btn btn-primary" data-toggle="collapse" href="#project_<?= $workerData->id ?>" role="button" aria-expanded="false" aria-controls="project_<?= $workerData->id ?>">
+                                    <a class="btn btn-primary" data-toggle="collapse" href="#project_<?= $worker->id . "_" . $day->day_of_week ?>" role="button" aria-expanded="false" aria-controls="project_<?= $worker->id . "_" . $day->day_of_week ?>">
                                         Rozbaliť projekty
                                     </a>
-                                    <div class="collapse" id="project_<?= $workerData->id ?>">
-                                        <div class="card card-body">
-                                            Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
-                                        </div>
+                                    <div class="collapse" id="project_<?= $worker->id . "_" . $day->day_of_week ?>">
+                                        <?php $projects = $service->GetRelevantProjectsForDay($workerData->id);
+                                        foreach ($projects as $project){
+                                            ?>
+                                            <label for="project_<?= $worker->id . "_" . $day->day_of_week . "_" . $project->id?>"><?=$project->name?></label>
+                                            <input type="time" name="projects[<?=$project->id?>]" id="project_<?= $worker->id . "_" . $day->day_of_week . "_" . $project->id?>">
+                                            <?php
+                                        }
+                                        ?>
                                     </div>
-                                    <input required type="text" name="project"
-                                           value="<?php if ($workerData != null) echo($workerData->project); ?>">
                                 </td>
                                 <td><input type="checkbox"
                                            name="done" <?php if (date("Y-m-d") < $day->day) echo "disabled" ?> <?php if ($workerData->done) echo "checked" ?>>
