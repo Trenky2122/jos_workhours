@@ -20,6 +20,7 @@ if (isset($_GET['w'])) {
 
 $days = $service->GetDaysInWeek($year, $week);
 $workers = $service->GetAllWorkers();
+echo json_encode($service->TimeIs0("0:00"));
 include "message_bar.php";
 ?>
     <div class="row mt-2">

@@ -1,4 +1,5 @@
 <?php
+//die(json_encode($_POST));
 if(!isset($_POST["worker_id"])||!isset($_POST["work_day_id"])||!isset($_POST["begin_time"])
     ||!isset($_POST["end_time"])||!isset($_POST["break_begin"])||!isset($_POST["break_end"])
     ||!isset($_POST["description"])){

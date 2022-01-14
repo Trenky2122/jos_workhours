@@ -338,10 +338,11 @@ WHERE w.worker_workday_id=? AND p.id=w.project_id";
     public function TimeIs0($time): bool
     {
         $myArray = str_split($time);
-
+        //echo json_encode($myArray);
         foreach($myArray as $character){
-            if($character != "0" && $character != ":")
+            if($character != "0" && $character != ":" &&$character!="") {
                 return false;
+            }
         }
         return true;
     }
