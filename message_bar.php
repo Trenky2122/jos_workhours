@@ -48,4 +48,13 @@ if(isset($_GET["succ"])){
         </div>
         <?php
     }
+    if($_GET["succ"]==2){
+        ?>
+        <div class="row">
+            <div class="alert alert-success" role="alert">
+                Používateľ vytvorený s heslom 'aleluja'.
+            </div>
+        </div>
+        <?php
+    }
 }

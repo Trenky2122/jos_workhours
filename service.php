@@ -75,7 +75,7 @@ class Service
             $stmt->bind_param("sssssisi", $begin_time, $end_time, $break_begin, $break_end,
                 $description, $worker_id, $workday_date, $done);
             $stmt->execute();
-            $worker_workday_id = $this->stmt->insert_id;
+            $worker_workday_id = $stmt->insert_id;
         }
         foreach ($projects as $project_id=>$value){
             $this->CreateOrEditProjectDataForWorkday($project_id, $worker_workday_id, $value);
@@ -347,7 +347,8 @@ WHERE w.worker_workday_id=? AND p.id=w.project_id";
         return true;
     }
 
-    public function GetProjectDataForWorkday($worker_workday_id){
+    public function GetProjectDataForWorkday($worker_workday_id): array
+    {
         if($worker_workday_id == 0)
             return array();
         $stmt = $this->mysqli->prepare("SELECT * FROM workday_project WHERE worker_workday_id=?");
@@ -359,5 +360,28 @@ WHERE w.worker_workday_id=? AND p.id=w.project_id";
             $retval[$row["project_id"]]=$row["time"];
         }
         return $retval;
+    }
+
+    public function CreateWorker($name, $surname, $member_since): bool
+    {
+        $stmt = $this->mysqli->prepare("INSERT INTO workers (name, surname, member_since) VALUES (?,?,?)");
+        $stmt->bind_param("sss", $name, $surname, $member_since);
+        $stmt->execute();
+        $id = $stmt->insert_id;
+        $stmt = $this->mysqli->prepare("INSERT INTO default_days(work_day_number, worker_id, begin_time, end_time, break_begin, break_end, description) 
+                                                VALUES (?,?,null,null,null,null,null)");
+        for($i=0; $i<7; $i++){
+            $stmt->bind_param("ii", $i, $id);
+            $stmt->execute();
+        }
+        return $this->mysqli->connect_errno == 0;
+    }
+
+    public function CreateProject($name): bool
+    {
+        $stmt = $this->mysqli->prepare("INSERT INTO projects (name) VALUES (?)");
+        $stmt->bind_param("s", $name);
+        $stmt->execute();
+        return $this->mysqli->connect_errno == 0;
     }
 }

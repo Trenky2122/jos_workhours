@@ -22,6 +22,9 @@
         <div class="col">
             <h1>JOS Group - pracovný čas</h1>
         </div>
+        <div class="col">
+            <a href="admin.php" style="color: #FFFFFF; float: right">Admin</a>
+        </div>
     </div>
 <?php
 

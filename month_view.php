@@ -99,7 +99,7 @@ $total_time = array();
                     ?>
                     <tr>
                         <td colspan="6"><strong>Suma:</strong></td>
-                        <td><strong><?=$service->CalculateTotaltime($total_time)?></strong></td>
+                        <td><strong><?=$service->CalculateTotalTime($total_time)?></strong></td>
                         <td colspan="2"></td>
                     </tr>
                     <tr>
