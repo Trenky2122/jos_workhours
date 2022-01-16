@@ -10,8 +10,8 @@ $mysqli->query("create table if not exists projects
     active tinyint(1) default 1 not null,
     constraint projects_name_uindex
         unique (name)
-);
-
+);");
+$mysqli->query("
 create table if not exists workers
 (
     id            int auto_increment
@@ -21,7 +21,9 @@ create table if not exists workers
     member_since  date                                                   null,
     password_hash varchar(32) default '1bd261529083ab372e5911b3c9e0cc71' not null,
     is_admin      tinyint(1)  default 0                                  not null
-);
+);");
+
+$mysqli->query("
 
 create table if not exists default_days
 (
@@ -39,8 +41,8 @@ create table if not exists default_days
     constraint default_days_workers_id_fk
         foreign key (worker_id) references workers (id)
             on update cascade on delete cascade
-);
-
+);");
+$mysqli->query("
 create table if not exists workers_workday
 (
     id            int auto_increment
@@ -57,8 +59,8 @@ create table if not exists workers_workday
         unique (worker_id, work_day_date),
     constraint workers_workday_workers_id_fk
         foreign key (worker_id) references workers (id)
-);
-
+);");
+$mysqli->query("
 create table if not exists workday_project
 (
     id                int auto_increment
