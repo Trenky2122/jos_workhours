@@ -20,7 +20,9 @@
             <img src="logo2.png" alt="logo" height="50">
         </div>
         <div class="col">
-            <h1>JOS Group - pracovný čas</h1>
+            <a href="index.php" style="color: #FFFFFF; text-decoration: none">
+                <h1>JOS Group - pracovný čas</h1>
+            </a>
         </div>
         <div class="col">
             <a href="admin.php" style="color: #FFFFFF; float: right">Admin</a>

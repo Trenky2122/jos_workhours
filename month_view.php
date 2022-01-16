@@ -21,15 +21,15 @@ $done_days = $service->GetDoneWorkerWorkDays($worker_id, $month, $year);
 $total_time = array();
 ?>
 
-    <div class="row noprint" style="margin-top: 1em">
+    <div class="row noprint mb-1" style="margin-top: 1em">
         <div class="col-1">
             <a href="index.php" class="btn btn-primary"> späť</a>
         </div>
         <div class="col-3">
             <form method="get" action="month_view.php">
                 <input type="hidden" name="id" value="<?=$worker_id?>">
-                <label for="month">mesiac/rok:</label>
-                <input type="month" id="month" name="m">
+                <label for="month" class="mb-1">mesiac/rok:</label>
+                <input type="month" class="mb-1" id="month" name="m" value="<?=$_GET["m"]?>">
                 <input type="submit" name="submit" value="Hľadať">
             </form>
         </div>
@@ -72,6 +72,7 @@ $total_time = array();
                                 $row = $done_days[$date2];
                             }
                             else {
+                                $row['id']=-1;
                                 $row['begin_time'] = null;
                                 $row['end_time'] = null;
                                 $row['break_begin'] = null;
@@ -93,7 +94,7 @@ $total_time = array();
                             array_push($total_time, $day_time);
                             echo("<td class='".$class."'>".$day_time."</td>");
                             echo("<td class='".$class."'>".$row['description']."</td>");
-                            echo("<td class='".$class."'>".$row['project']."</td>");
+                            echo("<td class='".$class."'>".($row["id"]==-1?"":$service->GetProjectsStringForWorkersWorkday($row["id"]))."</td>");
                             echo("</tr>");
                         }
                     ?>
@@ -112,7 +113,7 @@ $total_time = array();
             </table>
         </div>
     </div>
-    <div class="row noprint">
+    <div class="row noprint mt-1">
         <div class="col-1">
             <button class="btn btn-primary" id="pdf" onclick="window.print()">Export</button>
         </div>
@@ -120,10 +121,6 @@ $total_time = array();
 
 
     <style>
-        div{
-            margin: 0.7em;
-        }
-
         th, td{
             padding: 5px;
             text-align: left;
