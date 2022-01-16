@@ -20,6 +20,7 @@ if (isset($_GET['w'])) {
 
 $days = $service->GetDaysInWeek($year, $week);
 $workers = $service->GetAllWorkers();
+$list_of_days = ["Mon"=>"Pondelok", "Tue"=>"Utorok", "Wed"=>"Streda", "Thu"=>"Štvrtok", "Fri"=>"Piatok", "Sat"=>"Sobota", "Sun"=>"Nedeľa"];
 include "message_bar.php";
 ?>
     <div class="row mt-2">
@@ -104,7 +105,7 @@ include "message_bar.php";
                         $projectData = $service->GetProjectDataForWorkday($workerData->id);
                         ?>
                         <tr class="<?= "day_" . $day->day . " worker_" . $worker->id ?> table-row">
-                            <td><?= date("d.m.Y", strtotime($day->day)) ?></td>
+                            <td><?= $list_of_days[date("D", strtotime($day->day))]."<br>".date("d.m.Y", strtotime($day->day)) ?></td>
                             <form method="post" action="submit_workday.php">
                                 <input required type="hidden" name="work_day_id" value="<?= $day->day ?>">
                                 <input required type="hidden" name="worker_id" value="<?= $worker->id ?>">
