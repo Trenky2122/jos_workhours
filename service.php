@@ -3,7 +3,7 @@
 use JetBrains\PhpStorm\Pure;
 
 include "models.php";
-include "config.php";
+include_once "config.php";
 class Service
 {
     private mysqli $mysqli;
@@ -438,5 +438,20 @@ class Service
             $first = false;
         }
         return $retval;
+    }
+
+    public function CreateAdminWorker($name, $surname, $member_since): bool
+    {
+        $stmt = $this->mysqli->prepare("INSERT INTO workers (name, surname, member_since, is_admin) VALUES (?,?,?,1)");
+        $stmt->bind_param("sss", $name, $surname, $member_since);
+        $stmt->execute();
+        $id = $stmt->insert_id;
+        $stmt = $this->mysqli->prepare("INSERT INTO default_days(work_day_number, worker_id, begin_time, end_time, break_begin, break_end, description) 
+                                                VALUES (?,?,null,null,null,null,null)");
+        for($i=0; $i<7; $i++){
+            $stmt->bind_param("ii", $i, $id);
+            $stmt->execute();
+        }
+        return $this->mysqli->connect_errno == 0;
     }
 }
