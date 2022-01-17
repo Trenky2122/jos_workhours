@@ -30,7 +30,6 @@ $worker_name = $service->GetWorkerNameWithId($worker_id);
                     <th>Koniec pauzy</th>
                     <th>Celkový čas</th>
                     <th>Náplň práce</th>
-                    <th>Projekt</th>
                     <th>Heslo</th>
                     <th></th>
                 </tr>
@@ -66,9 +65,6 @@ $worker_name = $service->GetWorkerNameWithId($worker_id);
                                     </td>
                                     <td>
                                         <textarea name="description"><?= $row["description"]?></textarea>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="project" value="<?= $row["project"]?>">
                                     </td>
                                     <td><input required type="password" name="password"></td>
                                     <td><input required type="submit" class="btn btn-primary" value="Uložiť"></td>

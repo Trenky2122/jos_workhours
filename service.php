@@ -33,7 +33,7 @@ class Service
         return $retval;
     }
 
-    #[Pure] public function GetDaysInWeek($year, $week): array
+    public function GetDaysInWeek($year, $week): array
     {
         $retval = array();
         $string_date = $week . " monday january " . $year;
@@ -189,12 +189,12 @@ class Service
         }
         else{
             $stmt = $this->mysqli->prepare("INSERT INTO default_days (begin_time, end_time, break_begin,
-                           break_end, description, worker_id, work_day_number) VALUES (?,?,?,?,?,?,?,?)");
+                           break_end, description, worker_id, work_day_number) VALUES (?,?,?,?,?,?,?)");
         }
-        $stmt->bind_param("ssssssii", $begin_time, $end_time, $break_begin, $break_end,
+        $stmt->bind_param("sssssii", $begin_time, $end_time, $break_begin, $break_end,
             $description, $worker_id, $workday_number);
         $stmt->execute();
-        return $this->mysqli->error;
+        return $this->mysqli->errno==0;
     }
 
     public function SetWorkerDefaultToNull($worker_id, $day): string
