@@ -54,8 +54,7 @@ $total_time = array();
                         <th scope="col" class="sun">Deň</th>
                         <th scope="col" class="sun">Začiatočný čas</th>
                         <th scope="col" class="sun">Konečný čas</th>
-                        <th scope="col" class="sun">Začiatok pauzy</th>
-                        <th scope="col" class="sun">Koniec pauzy</th>
+                        <th scope="col" class="sun">Pauza</th>
                         <th scope="col" class="sun">Celkový čas</th>
                         <th scope="col" class="sun">Náplň práce</th>
                         <th scope="col" class="sun">Projekt</th>
@@ -88,8 +87,8 @@ $total_time = array();
                             echo("<td class='".$class."'>".$day."</td>");
                             echo("<td class='".$class."'>".substr($row['begin_time'], 0, 5)."</td>");
                             echo("<td class='".$class."'>".substr($row['end_time'], 0, 5)."</td>");
-                            echo("<td class='".$class."'>".substr($row['break_begin'], 0, 5)."</td>");
-                            echo("<td class='".$class."'>".substr($row['break_end'], 0, 5)."</td>");
+                            $pause=$service->CalculateDayTime($row["break_begin"], $row["break_end"], null, null);
+                            echo("<td class='".$class."'>".$pause."</td>");
                             $day_time = $service->CalculateDayTime($row['begin_time'], $row['end_time'], $row['break_begin'], $row['break_end']);
                             array_push($total_time, $day_time);
                             echo("<td class='".$class."'>".$day_time."</td>");
@@ -99,16 +98,16 @@ $total_time = array();
                         }
                     ?>
                     <tr>
-                        <td colspan="6"><strong>Suma:</strong></td>
+                        <td colspan="5"><strong>Suma:</strong></td>
                         <td><strong><?=$service->CalculateTotalTime($total_time)?></strong></td>
                         <td colspan="2"></td>
                     </tr>
                     <tr>
                         <td colspan="3" style='border: none;'>Dátum: <?=$list_of_dates[count($list_of_dates) - 1][0]?></td>
                         <td colspan="3" style='border: none;'>Podpis zamestnanca</td>
-                        <td colspan="3" style='border: none;'>Pečiatka a podpis zamestnávateľa</td>
+                        <td colspan="2" style='border: none;'>Pečiatka a podpis zamestnávateľa</td>
                     </tr>
-                    <tr><td colspan="9" style="border: none; padding: 20px;"></td></tr>
+                    <tr><td colspan="8" style="border: none; padding: 20px;"></td></tr>
                 </tbody>
             </table>
         </div>

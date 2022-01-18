@@ -111,6 +111,17 @@ class Service
             $retval->done = $day["done"];
             return $retval;
         }
+        if($workday->day<date("Y-m-d")){
+            $retval = new WorkerWorkDay();
+            $retval->id=0;
+            $retval->begin_time = null;
+            $retval->end_time = null;
+            $retval->break_begin = null;
+            $retval->break_end = null;
+            $retval->description = null;
+            $retval->done = false;
+            return $retval;
+        }
         $days_of_week = array("Pondelok"=>0, "Utorok"=>1, "Streda"=>2, "Štvrtok"=>3, "Piatok"=>4, "Sobota"=>5, "Nedeľa"=>6);
         $day_number = $days_of_week[$workday->day_of_week];
         $stmt = $this->mysqli->prepare("SELECT * FROM default_days WHERE worker_id=? and work_day_number=?");
@@ -453,5 +464,27 @@ class Service
             $stmt->execute();
         }
         return $this->mysqli->connect_errno == 0;
+    }
+
+    public function GetWorkerDataForProject($project_id, $from, $to): array
+    {
+        $sql = "SELECT u.name, u.surname, time FROM workers_workday w, workday_project p, workers u WHERE p.worker_workday_id = w.id AND p.project_id=? 
+                AND u.id=w.worker_id AND w.work_day_date>=? AND w.work_day_date<=? AND w.done=1";
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("iss", $project_id, $from, $to);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $values = array();
+        while ($row = $result->fetch_assoc()){
+            if(!isset($values[$row["name"]." ".$row["surname"]])){
+                $values[$row["name"]." ".$row["surname"]]=array();
+            }
+            $values[$row["name"]." ".$row["surname"]][]=$row["time"];
+        }
+        $retval = array();
+        foreach ($values as $key=>$value){
+            $retval[$key]=$this->CalculateTotalTime($value);
+        }
+        return $retval;
     }
 }

@@ -36,9 +36,10 @@ if(isset($_GET["to"])&&!empty($_GET["to"]))
             <?php
             $projects = $service->GetAllProjects();
             foreach ($projects as $project){
+                $workerData=$service->GetWorkerDataForProject($project->id, $from, $to);
                 ?>
                 <tr>
-                    <td><?=$project->name?></td>
+                    <td><strong><?=$project->name?></strong></td>
                     <td><?=$service->GetProjectTimeSince($project->id, $from, $to)?></td>
                     <td><?=$project->active?"áno":"nie"?></td>
                     <td>
@@ -50,6 +51,16 @@ if(isset($_GET["to"])&&!empty($_GET["to"]))
                     </td>
                 </tr>
                 <?php
+                foreach ($workerData as $name=>$time){
+                    ?>
+                    <tr>
+                        <td><?=$name?></td>
+                        <td><?=$time?></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <?php
+                }
             }
             ?>
             </tbody>
