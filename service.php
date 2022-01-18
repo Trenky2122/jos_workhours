@@ -1,7 +1,5 @@
 <?php
 
-use JetBrains\PhpStorm\Pure;
-
 include "models.php";
 include_once "config.php";
 class Service
