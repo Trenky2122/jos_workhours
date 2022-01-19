@@ -5,7 +5,7 @@ define("BYPASS_AUYHENTICATE", 1);
 include "header.php";
 include "message_bar.php";
 ?>
-    <form action="submit_login.php" method="post">
+    <form action="submit_login.php" method="post" style="padding-top: 2em;">
         <div class="row mt-1">
             <div class="col">
                 <label style="float: right" for="name">Meno:</label>
@@ -25,7 +25,7 @@ include "message_bar.php";
         <div class="row mt-1">
             <div class="col"></div>
             <div class="col">
-                <input type="submit" value="Prihlásiť" name="submit">
+                <input class="btn btn-primary" type="submit" value="Prihlásiť" name="submit">
             </div>
         </div>
     </form>

@@ -22,10 +22,10 @@
 <script src="scripts.js" type="application/javascript"></script>
 <div class="container-fluid">
     <div class="row" style="background-color: #0132B9; color: #FFFFFF;">
-        <div class="col-1">
+        <div class="col-2">
             <img src="logo2.png" alt="logo" height="50">
         </div>
-        <div class="col-8">
+        <div class="col-7">
             <a href="index.php" style="color: #FFFFFF; text-decoration: none;">
                 <h1>JOS Group - pracovný čas</h1>
             </a>

@@ -7,6 +7,11 @@ if(!isset($_POST["submit"])){
 session_unset();
 session_destroy();
 
+if(!isset($_COOKIE["jos_username"]) || !isset($_COOKIE["jos_user_auth"])){
+    header("Location: index.php");
+    die();
+}
+
 if(isset($_COOKIE["jos_username"])){
     setcookie("jos_username", null);
 }

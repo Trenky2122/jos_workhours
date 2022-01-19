@@ -10,7 +10,7 @@ if(isset($_GET["from"])&&!empty($_GET["from"]))
 if(isset($_GET["to"])&&!empty($_GET["to"]))
     $to=$_GET["to"];
 ?>
-<div class="row">
+<div class="row" style="margin-top: 1.5em">
     <div class="col">
         <form method="get">
             <label for="from">Od:</label>
