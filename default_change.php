@@ -66,7 +66,6 @@ $worker_name = $service->GetWorkerNameWithId($worker_id);
                                     <td>
                                         <textarea name="description"><?= $row["description"]?></textarea>
                                     </td>
-                                    <td><input required type="password" name="password"></td>
                                     <td><input required type="submit" class="btn btn-primary" value="Uložiť"></td>
                                 </form>
                             </tr>

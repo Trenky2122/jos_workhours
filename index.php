@@ -110,7 +110,7 @@ include "message_bar.php";
                                                     <div class="col-8">
                                                         <input type="time" name="projects[<?= $project->id ?>]"
                                                                id="project_<?= $worker->id . "_" . $day->day_of_week . "_" . $project->id ?>"
-                                                               value="<?= $projectData[$project->id] ?? "00:00:00" ?>">
+                                                               value="<?= $projectData[$project->id] ?? null ?>">
                                                     </div>
                                                 </div>
                                                 <?php
