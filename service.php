@@ -485,4 +485,49 @@ class Service
         }
         return $retval;
     }
+
+    public function GetUser($username, $password){
+        $sql = "SELECT * FROM workers WHERE username=? AND password_hash=MD5(?)";
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("ss", $username, $password);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_object("Worker");
+    }
+
+    public function SaveCookie($username, $cookie):bool{
+        $sql = "INSERT INTO user_cookies(username, cookie) VALUES (?, ?)";
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("ss", $username, $cookie);
+        return $stmt->execute();
+    }
+
+    public function GetUserWithUsername($username){
+        $sql = "SELECT * FROM workers WHERE username=?";
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_object("Worker");
+    }
+
+    public function CheckUserInCookies($username, $cookie){
+        $sql = "SELECT * FROM user_cookies WHERE username=? AND cookie=?";
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("ss", $username, $cookie);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if($result->num_rows > 0)
+            return true;
+        return false;
+    }
+
+    public function GetWorkerWithId($id){
+        $sql = "SELECT * FROM workers WHERE id=?";
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_object("Worker");
+    }
 }

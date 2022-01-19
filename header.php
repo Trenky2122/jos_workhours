@@ -1,3 +1,9 @@
+<?php
+    if(!defined("BYPASS_AUYHENTICATE") || !BYPASS_AUYHENTICATE) {
+        include "authenticate.php";
+    }
+?>
+
 <!DOCTYPE html>
 <html lang="sk">
 <head>
@@ -19,14 +25,23 @@
         <div class="col-1">
             <img src="logo2.png" alt="logo" height="50">
         </div>
-        <div class="col">
-            <a href="index.php" style="color: #FFFFFF; text-decoration: none">
+        <div class="col-8">
+            <a href="index.php" style="color: #FFFFFF; text-decoration: none;">
                 <h1>JOS Group - pracovný čas</h1>
             </a>
         </div>
-        <div class="col">
-            <a href="admin.php" style="color: #FFFFFF; float: right">Admin</a>
+        <div class="col-3">
+            <div class="row">
+                <div class="col">
+                    <a href="admin.php" style="color: #FFFFFF; float: right;  text-decoration: none;">Admin</a>
+                </div>
+                <div class="col">
+                    <form method="post" action="logout.php" style="float: right;">
+                        <input type="submit" name="submit" value="Odhlásiť sa" style="background: transparent; color: #FFFFFF; border: none;">
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
-<?php
+
 

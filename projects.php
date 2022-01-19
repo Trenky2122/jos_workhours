@@ -1,7 +1,7 @@
 <?php
 include "header.php";
 include "message_bar.php";
-include "service.php";
+include_once "service.php";
 $service = new Service();
 $from = "0000-01-01";
 $to = "9999-12-31";

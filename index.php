@@ -1,6 +1,12 @@
 <?php
 include "header.php";
-include "service.php";
+include_once "service.php";
+
+if(!isset($_SESSION["user_id"])){
+    header("Location: login.php?err=1");
+    die();
+}
+
 $service = new Service();
 $year = date("Y");
 $month = date("m");
@@ -19,55 +25,13 @@ if (isset($_GET['w'])) {
 }
 
 $days = $service->GetDaysInWeek($year, $week);
-$workers = $service->GetAllWorkers();
+$worker = $service->GetWorkerWithId($_SESSION["user_id"]);
 $list_of_days = ["Mon"=>"Pondelok", "Tue"=>"Utorok", "Wed"=>"Streda", "Thu"=>"Štvrtok", "Fri"=>"Piatok", "Sat"=>"Sobota", "Sun"=>"Nedeľa"];
 include "message_bar.php";
 ?>
-    <div class="row mt-2">
-        <div class="col-3">
-            <label for="worker_select">Filter zamestnanec</label>
-            <select id="worker_select" onchange="reloadFilter()">
-                <option value="0">Všetci</option>
-                <?php
-                foreach ($workers as $worker) {
-                    ?>
-                    <option value="<?= "worker_" . $worker->id ?>"><?= $worker->GetFullName() ?></option>
-                    <?php
-                }
-                ?>
-            </select>
-        </div>
-        <div class="col-3">
-            <label for="day_select">Filter deň</label>
-            <select id="day_select" onchange="reloadFilter()">
-                <option value="0">Celý týždeň</option>
-                <?php
-                foreach ($days as $day) {
-                    ?>
-                    <option value="<?= "day_" . $day->day ?>"><?= $day->day_of_week . " " . date("d.m.Y", strtotime($day->day)) ?></option>
-                    <?php
-                }
-                ?>
-            </select>
-        </div>
-        <div class="col-6">
-            <form method="get" action="index.php">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-xl-6 col-10 col-lg-8">
-                            <label for="week">Týždeň</label>
-                            <input type="week" id="week" name="w">
-                        </div>
-                        <div class="col-2">
-                            <input type="submit" name="submit" value="Hľadať">
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col">
+
+<div class="row">
+        <div class="col" style="overflow-x: auto">
             <table class="table table-stripped">
                 <thead>
                 <tr>
@@ -85,10 +49,6 @@ include "message_bar.php";
                 </tr>
                 </thead>
                 <tbody>
-
-                <?php
-                foreach ($workers as $worker) {
-                    ?>
                     <tr class="table-row worker_<?= $worker->id ?> worker_name">
                         <td><strong><?= $worker->GetFullName() ?></strong></td>
                         <td colspan="2"><a href="default_change.php?id=<?= $worker->id ?>" class="btn btn-primary">upraviť
@@ -143,7 +103,7 @@ include "message_bar.php";
                                             <?php $projects = $service->GetRelevantProjectsForDay($workerData->id);
                                             foreach ($projects as $project) {
                                                 ?>
-                                                <div class="row">
+                                                <div class="row" style="padding: 5px;">
                                                     <div class="col-4">
                                                         <label for="project_<?= $worker->id . "_" . $day->day_of_week . "_" . $project->id ?>"><?= $project->name ?></label>
                                                     </div>
@@ -162,7 +122,6 @@ include "message_bar.php";
                                 <td><input type="checkbox"
                                            name="done" <?php if (date("Y-m-d") < $day->day) echo "disabled" ?> <?php if ($workerData->done) echo "checked" ?>>
                                 </td>
-                                <td><input required type="password" name="password"></td>
                                 <td id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>"><input required
                                                                                                        type="submit"
                                                                                                        class="btn btn-primary"
@@ -174,13 +133,9 @@ include "message_bar.php";
                             </form>
                         </tr>
                         <?php
-                    }
                 }
                 ?>
                 </tbody>
             </table>
         </div>
     </div>
-
-<?php
-include "footer.php";

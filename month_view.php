@@ -1,6 +1,6 @@
 <?php
 include "header.php";
-include "service.php";
+include_once "service.php";
 
 $service = new Service();
 $worker_id = $_GET["id"];

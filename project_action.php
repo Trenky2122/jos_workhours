@@ -3,7 +3,7 @@ if(!isset($_POST["admin_password"])||!isset($_POST["project_id"])||!isset($_POST
     header("Location: projects.php?err=1");
     die();
 }
-include "service.php";
+include_once "service.php";
 $service = new Service();
 if(!$service->WorkerCorrectPassword(-1, $_POST["admin_password"])){
     header("Location: projects.php?err=2");

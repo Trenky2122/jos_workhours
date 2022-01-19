@@ -57,4 +57,22 @@ if(isset($_GET["succ"])){
         </div>
         <?php
     }
+    if($_GET["succ"]==3){
+        ?>
+        <div class="row">
+            <div class="alert alert-success" role="alert">
+                Úspešne prihlásený.
+            </div>
+        </div>
+        <?php
+    }
+    if($_GET["succ"]==4){
+        ?>
+        <div class="row">
+            <div class="alert alert-success" role="alert">
+                Úspešne odhlásený.
+            </div>
+        </div>
+        <?php
+    }
 }

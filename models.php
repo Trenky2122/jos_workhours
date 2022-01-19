@@ -6,6 +6,7 @@ class Worker{
     public int $id;
     public bool $is_admin;
     public string $password_hash;
+    public string $username;
     public function GetFullName(): string{
         return $this->name." ".$this->surname;
     }

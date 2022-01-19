@@ -8,11 +8,6 @@ if(!isset($_POST["worker_id"])||!isset($_POST["begin_time"])
 
 include "service.php";
 $service = new Service();
-if(!$service->WorkerCorrectPassword($_POST["worker_id"], $_POST["password"])){
-    header("Location: default_change.php?id=" . $_POST["worker_id"] . "&err=2");
-    die();
-}
-
 
 if($service->CreateOrUpdateDefaultForUser($_POST["worker_id"], $_POST['workday_number'], $_POST['begin_time'], $_POST['end_time'],
                                             $_POST['break_begin'], $_POST['break_end'], $_POST['description']))
