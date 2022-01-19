@@ -29,7 +29,23 @@ $worker = $service->GetWorkerWithId($_SESSION["user_id"]);
 $list_of_days = ["Mon"=>"Pondelok", "Tue"=>"Utorok", "Wed"=>"Streda", "Thu"=>"Štvrtok", "Fri"=>"Piatok", "Sat"=>"Sobota", "Sun"=>"Nedeľa"];
 include "message_bar.php";
 ?>
-
+<div class="row mt-1">
+    <div class="col-6">
+        <form method="get" action="index.php">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-xl-6 col-10 col-lg-8">
+                        <label for="week">Týždeň</label>
+                        <input type="week" id="week" name="w">
+                    </div>
+                    <div class="col-2">
+                        <input type="submit" name="submit" value="Hľadať">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 <div class="row">
         <div class="col" style="overflow-x: auto">
             <table class="table table-stripped">
