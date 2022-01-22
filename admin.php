@@ -10,10 +10,10 @@ include "header.php";
     <div class="row mt-1" style="padding-top: 1em;">
         <div class="col">
             <ul>
-                <li><a href="add_worker.php">Pridať používateľa</a></li>
-                <li><a href="add_project.php">Pridať projekt</a></li>
+                <?php if($_SESSION["user_role"]==1){?><li><a href="add_worker.php">Pridať používateľa</a></li><?php }?>
+                <?php if($_SESSION["user_role"]==1){?><li><a href="add_project.php">Pridať projekt</a></li><?php }?>
                 <li><a href="projects.php">Prehľad projektov</a></li>
-                <li><a href="overview.php">Prehľad používateľov</a></li>
+                <li><a href="overview.php">Týždenný prehľad</a></li>
             </ul>
         </div>
     </div>

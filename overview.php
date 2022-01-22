@@ -51,7 +51,7 @@ include "message_bar.php";
             </select>
         </div>
         <div class="col-6">
-            <form method="get" action="index.php">
+            <form method="get" action="overview.php">
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-xl-6 col-10 col-lg-8">
