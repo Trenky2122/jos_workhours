@@ -10,7 +10,7 @@ if(!$service->WorkerCorrectPassword(-1, $_POST["admin_password"])){
     header("Location: add_worker.php?err=2");
     die();
 }
-if($service->CreateWorker($_POST["name"], $_POST["surname"], $_POST["since"])){
+if($service->CreateWorker($_POST["name"], $_POST["surname"], $_POST["since"], $_POST["username"])){
     header("Location: index.php?succ=2");
 }
 else{

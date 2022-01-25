@@ -365,10 +365,11 @@ class Service
         return $retval;
     }
 
-    public function CreateWorker($name, $surname, $member_since): bool
+    public function CreateWorker($name, $surname, $member_since, $username): bool
     {
-        $stmt = $this->mysqli->prepare("INSERT INTO workers (name, surname, member_since) VALUES (?,?,?)");
-        $stmt->bind_param("sss", $name, $surname, $member_since);
+        $stmt = $this->mysqli->prepare("INSERT INTO workers (name, surname, member_since, username)
+            VALUES (?,?,?, ?)");
+        $stmt->bind_param("ssss", $name, $surname, $member_since, $username);
         $stmt->execute();
         $id = $stmt->insert_id;
         $stmt = $this->mysqli->prepare("INSERT INTO default_days(work_day_number, worker_id, begin_time, end_time, break_begin, break_end, description) 

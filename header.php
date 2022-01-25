@@ -34,9 +34,9 @@
         <div class="col-3">
             <div class="row">
                 <div class="col">
-                    <a href="admin.php" style="color: #FFFFFF; float: right;  text-decoration: none;">Ďalšie akcie</a>
+                    <a href="admin.php" class="noprint" style="color: #FFFFFF; float: right;  text-decoration: none;">Ďalšie akcie</a>
                 </div>
-                <div class="col">
+                <div class="col noprint">
                     <form method="post" action="logout.php" style="float: right;">
                         <input type="submit" name="submit" value="Odhlásiť sa" style="background: transparent; color: #FFFFFF; border: none;">
                     </form>

@@ -41,13 +41,13 @@ $total_time = array();
                 <thead>
                     <tr>
                         <td colspan="6" rowspan="3">Mesiac: <?= $month ?>/<?= $year ?></td>
-                        <td colspan="3">Pracovný čas</td>
+                        <td colspan="3" class="last">Pracovný čas</td>
                     </tr>
                     <tr>
-                        <td colspan="3">Firma: JOS GROUP s.r.o.</td>
+                        <td colspan="3" class="last">Firma: JOS GROUP s.r.o.</td>
                     </tr>
                     <tr>
-                        <td colspan="3">Zamestnanec: <?= $worker_name ?></td>
+                        <td colspan="3" class="last">Zamestnanec: <?= $worker_name ?></td>
                     </tr>
                     <tr>
                         <th scope="col" class="sun">Mesiac</th>
@@ -57,7 +57,7 @@ $total_time = array();
                         <th scope="col" class="sun">Pauza</th>
                         <th scope="col" class="sun">Celkový čas</th>
                         <th scope="col" class="sun">Náplň práce</th>
-                        <th scope="col" class="sun">Projekt</th>
+                        <th scope="col" class="sun last">Projekt</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -90,24 +90,24 @@ $total_time = array();
                             $pause=$service->CalculateDayTime($row["break_begin"], $row["break_end"], null, null);
                             echo("<td class='".$class."'>".$pause."</td>");
                             $day_time = $service->CalculateDayTime($row['begin_time'], $row['end_time'], $row['break_begin'], $row['break_end']);
-                            array_push($total_time, $day_time);
-                            echo("<td class='".$class."'>".$day_time."</td>");
+                            $total_time[] = $day_time;
+                            echo("<td class='".$class." total'>".$day_time."</td>");
                             echo("<td class='".$class."'>".$row['description']."</td>");
-                            echo("<td class='".$class."'>".($row["id"]==-1?"":$service->GetProjectsStringForWorkersWorkday($row["id"]))."</td>");
+                            echo("<td class='".$class." last'>".($row["id"]==-1?"":$service->GetProjectsStringForWorkersWorkday($row["id"]))."</td>");
                             echo("</tr>");
                         }
                     ?>
                     <tr>
-                        <td colspan="5"><strong>Suma:</strong></td>
-                        <td><strong><?=$service->CalculateTotalTime($total_time)?></strong></td>
-                        <td colspan="2"></td>
+                        <td colspan="5" class="sum"><strong>Suma:</strong></td>
+                        <td class="sum"><strong><?=$service->CalculateTotalTime($total_time)?></strong></td>
+                        <td class="sum" colspan="2"></td>
                     </tr>
                     <tr>
                         <td colspan="3" style='border: none;'>Dátum: <?=$list_of_dates[count($list_of_dates) - 1][0]?></td>
                         <td colspan="3" style='border: none;'>Podpis zamestnanca</td>
-                        <td colspan="2" style='border: none;'>Pečiatka a podpis zamestnávateľa</td>
+                        <td colspan="2" style='border: none;border-right: 2px solid black;'>Pečiatka a podpis zamestnávateľa</td>
                     </tr>
-                    <tr><td colspan="8" style="border: none; padding: 20px;"></td></tr>
+                    <tr><td colspan="8" style="border: none; padding: 20px;border-right: 2px solid black;"></td></tr>
                 </tbody>
             </table>
         </div>
@@ -137,6 +137,19 @@ $total_time = array();
 
         .ord{
             border-bottom: 1px solid black;
+        }
+
+        .total{
+            border-left: 2px solid black;
+            border-right: 2px solid black;
+        }
+
+        .sum{
+            border: 2px solid black;
+        }
+
+        .last{
+            border-right: 2px solid black;
         }
 
         @media print{

@@ -29,6 +29,14 @@ include "message_bar.php";
             </div>
             <div class="row mb-1">
                 <div class="col-3">
+                    <label for="username">Prihlasovacie meno:</label>
+                </div>
+                <div class="col-6">
+                    <input type="text" name="username" id="username">
+                </div>
+            </div>
+            <div class="row mb-1">
+                <div class="col-3">
                     <label for="since">Členom od:</label>
                 </div>
                 <div class="col-6">
