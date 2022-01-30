@@ -12,13 +12,11 @@ function recalculateHours(element_id) {
     } else {
         document.getElementById(element_id).innerHTML = "0:00";
     }
-    console.log(element_id);
 }
 
 function calculateTimeDifference(time_begin, time_end) {
     time_begin = time_begin.substring(0, 5);
     time_end = time_end.substring(0, 5);
-    console.log(arguments);
     let time_begin_min = time_begin.substring(3);
     let time_end_min = time_end.substring(3);
     let minutes = time_end_min - time_begin_min >= 0 ? time_end_min - time_begin_min : 60 + (time_end_min - time_begin_min);
@@ -26,7 +24,7 @@ function calculateTimeDifference(time_begin, time_end) {
     let hours_end = time_end.substring(0, 2);
     let hours = hours_end - hours_begin - (time_end_min - time_begin_min >= 0 ? 0 : 1);
     if (hours < 0)
-        return "00:00";
+        return "Negative time";
     return (hours < 10 ? "0" : "") + hours.toString() + ":" + (minutes < 10 ? "0" : "") + minutes.toString();
 }
 
@@ -55,4 +53,17 @@ function reloadFilter() {
         className=className.substring(1);
     let elsToShow = document.getElementsByClassName(className);
     [].forEach.call(elsToShow, (el) => el.style.display = "table-row");
+}
+
+function verifyProjectInputs(classnameProjects, valueId, collapse){
+    let allProjectTimes = document.getElementsByClassName(classnameProjects);
+    let originalTime = document.getElementById(valueId).innerHTML;
+    [].forEach.call(allProjectTimes, (element) => {
+        originalTime = calculateTimeDifference(element.value, originalTime);
+    });
+    if(originalTime != "00:00"){
+        $("#"+collapse).collapse('show');
+        return false;
+    }
+    return true;
 }

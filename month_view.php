@@ -100,14 +100,25 @@ $total_time = array();
                     <tr>
                         <td colspan="5" class="sum"><strong>Suma:</strong></td>
                         <td class="sum"><strong><?=$service->CalculateTotalTime($total_time)?></strong></td>
-                        <td class="sum" colspan="2"></td>
+                        <td class="sum" colspan="2">
+                            <?php
+                            $projectData = $service->GetProjectDataForWorker($worker_id, $list_of_dates[0][0], end($list_of_dates)[0]);
+                            foreach ($projectData as $key=>$value){
+                                echo "<strong>".$key."</strong>: ".$value."&emsp;&emsp;&emsp;&emsp;";
+                            }
+                            ?></td>
+                    </tr>
+                    <tr>
                     </tr>
                     <tr>
                         <td colspan="3" style='border: none;'>Dátum: <?=$list_of_dates[count($list_of_dates) - 1][0]?></td>
                         <td colspan="3" style='border: none;'>Podpis zamestnanca</td>
                         <td colspan="2" style='border: none;border-right: 2px solid black;'>Pečiatka a podpis zamestnávateľa</td>
                     </tr>
-                    <tr><td colspan="8" style="border: none; padding: 20px;border-right: 2px solid black;"></td></tr>
+                    <tr>
+                        <td colspan="8" style="border: none; padding: 20px;border-right: 2px solid black;">
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>

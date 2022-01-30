@@ -39,10 +39,10 @@ if(isset($_GET["to"])&&!empty($_GET["to"]))
                 $workerData=$service->GetWorkerDataForProject($project->id, $from, $to);
                 ?>
                 <tr>
-                    <td><strong><?=$project->name?></strong></td>
-                    <td><?=$service->GetProjectTimeSince($project->id, $from, $to)?></td>
-                    <td><?=$project->active?"áno":"nie"?></td>
-                    <td>
+                    <td style="border-bottom: black solid 1px; border-top: black solid 2px"><strong><?=$project->name?></strong></td>
+                    <td style="border-bottom: black solid 1px; border-top: black solid 2px"><?=$service->GetProjectTimeSince($project->id, $from, $to)?></td>
+                    <td style="border-bottom: black solid 1px; border-top: black solid 2px"><?=$project->active?"áno":"nie"?></td>
+                    <td style="border-bottom: black solid 1px; border-top: black solid 2px">
                         <form action="project_action.php" method="post">
                             <input type="hidden" value="<?=$project->id?>" name="project_id">
                             <input type="submit" name="submit" class="mb-1" value="<?=$project->active?"Deaktivovať":"Aktivovať"?>"><br>

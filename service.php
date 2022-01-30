@@ -500,6 +500,10 @@ class Service
     }
 
     public function SaveCookie($username, $cookie):bool{
+        $sql0 = "DELETE FROM user_cookies WHERE username=? AND cookie=?";
+        $stmt = $this->mysqli->prepare($sql0);
+        $stmt->bind_param("ss", $username, $cookie);
+        $stmt->execute();
         $sql = "INSERT INTO user_cookies(username, cookie) VALUES (?, ?)";
         $stmt = $this->mysqli->prepare($sql);
         $stmt->bind_param("ss", $username, $cookie);
@@ -533,5 +537,26 @@ class Service
         $stmt->execute();
         $result = $stmt->get_result();
         return $result->fetch_object("Worker");
+    }
+
+    public function GetProjectDataForWorker($worker_id, $from, $to){
+        $sql = "SELECT pj.name, time FROM projects pj, workers_workday w, workday_project wp WHERE wp.worker_workday_id = w.id AND wp.project_id=pj.id
+                AND w.worker_id=? AND w.work_day_date>=? AND w.work_day_date<=? AND w.done=1";
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("iss", $worker_id, $from, $to);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $values = array();
+        while ($row = $result->fetch_assoc()){
+            if(!isset($values[$row["name"]])){
+                $values[$row["name"]]=array();
+            }
+            $values[$row["name"]][]=$row["time"];
+        }
+        $retval = array();
+        foreach ($values as $key=>$value){
+            $retval[$key]=$this->CalculateTotalTime($value);
+        }
+        return $retval;
     }
 }
