@@ -15,7 +15,7 @@ $start_time = strtotime($start_date);
 $end_time = strtotime("+1 month", $start_time);
 for($i=$start_time; $i<$end_time; $i+=86400)
 {
-    array_push($list_of_dates, array(date('d.m.Y', $i), date('D', $i)));
+    array_push($list_of_dates, array(date('d.m.Y', $i), date('D', $i), date("Y-m-d", $i)));
 }
 $done_days = $service->GetDoneWorkerWorkDays($worker_id, $month, $year);
 $total_time = array();
@@ -102,7 +102,7 @@ $total_time = array();
                         <td class="sum"><strong><?=$service->CalculateTotalTime($total_time)?></strong></td>
                         <td class="sum" colspan="2">
                             <?php
-                            $projectData = $service->GetProjectDataForWorker($worker_id, $list_of_dates[0][0], end($list_of_dates)[0]);
+                            $projectData = $service->GetProjectDataForWorker($worker_id, $list_of_dates[0][2], end($list_of_dates)[2]);
                             foreach ($projectData as $key=>$value){
                                 echo "<strong>".$key."</strong>: ".$value."&emsp;&emsp;&emsp;&emsp;";
                             }
