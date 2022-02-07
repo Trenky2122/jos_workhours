@@ -539,7 +539,8 @@ class Service
         return $result->fetch_object("Worker");
     }
 
-    public function GetProjectDataForWorker($worker_id, $from, $to){
+    public function GetProjectDataForWorker($worker_id, $from, $to): array
+    {
         $sql = "SELECT pj.name, time FROM projects pj, workers_workday w, workday_project wp WHERE wp.worker_workday_id = w.id AND wp.project_id=pj.id
                 AND w.worker_id=? AND w.work_day_date>=? AND w.work_day_date<=? AND w.done=1";
         $stmt = $this->mysqli->prepare($sql);
@@ -558,5 +559,22 @@ class Service
             $retval[$key]=$this->CalculateTotalTime($value);
         }
         return $retval;
+    }
+
+    public function WorkerHasMonthClosed($worker_id, $month):bool{
+        $sql = "SELECT * FROM closed_months WHERE worker_id=? AND month=? AND to_be_reworked=0";
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("is", $worker_id, $month);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->num_rows > 0;
+    }
+
+    public function CloseMonthForWorker($worker_id, $month){
+        $sql = "INSERT INTO closed_months(worker_id, month) VALUES (?,?)";
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("is", $worker_id, $month);
+        $stmt->execute();
+        return $stmt->errno;
     }
 }

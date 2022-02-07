@@ -19,6 +19,7 @@ for($i=$start_time; $i<$end_time; $i+=86400)
 }
 $done_days = $service->GetDoneWorkerWorkDays($worker_id, $month, $year);
 $total_time = array();
+include "message_bar.php";
 ?>
 
     <div class="row noprint mb-1" style="margin-top: 1em">
@@ -123,9 +124,22 @@ $total_time = array();
             </table>
         </div>
     </div>
-    <div class="row noprint mt-1">
+    <div class="row noprint mt-1 mb-1">
         <div class="col-1">
             <button class="btn btn-primary" id="pdf" onclick="window.print()">Export</button>
+        </div>
+        <div class="col-6">
+            <?php if(!($closed=$service->WorkerHasMonthClosed($worker_id, $_GET["m"]))&&($_SESSION["user_id"]==$worker_id || $_SESSION["user_role"]==1)){?>
+            <form action="submit_close_month.php" method="post">
+                <input type="hidden" value="<?=$worker_id?>" name="worker_id">
+                <input type="hidden" value="<?=$_GET["m"]?>" name="month">
+                <input class="btn btn-primary" name="submit" value="Uzavrieť mesiac" type="submit">
+            </form>
+            <?php } else if($closed){?>
+                <div class="alert alert-info" role="alert">
+                    Mesiac bol uzavretý.
+                </div>
+        <?php } ?>
         </div>
     </div>
 

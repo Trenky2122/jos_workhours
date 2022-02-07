@@ -75,4 +75,13 @@ if(isset($_GET["succ"])){
         </div>
         <?php
     }
+    if($_GET["succ"]==5){
+        ?>
+        <div class="row">
+            <div class="alert alert-success" role="alert">
+                Mesiac úspešne uzavretý.
+            </div>
+        </div>
+        <?php
+    }
 }

@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:mysql://mysql80.r1.websupport.sk:3314/jos_workhours</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="gh364400db@46.229.230.119" uuid="eb1b77cf-1b62-4ee3-a162-bfe0ce7f5792">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://46.229.230.119/gh364400db</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
