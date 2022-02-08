@@ -60,7 +60,7 @@ include "message_bar.php";
                 <th>Náplň práce</th>
                 <th>Projekt</th>
                 <th>Vykonané</th>
-                <th>Heslo</th>
+                <th>Odoslať</th>
                 <th></th>
             </tr>
             </thead>
@@ -77,6 +77,7 @@ include "message_bar.php";
             </tr>
             <?php
             foreach ($days as $day) {
+                $closed = $service->WorkerHasDayClosed($worker->id, $day->day);
                 $workerData = $service->GetWorkerWorkDay($worker->id, $day);
                 $projectData = $service->GetProjectDataForWorkday($workerData->id);
                 ?>
@@ -92,23 +93,24 @@ include "message_bar.php";
                                    id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_begin_time"
                                    onchange="recalculateHours('total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>')"
                                    type="time" step="300" name="begin_time"
-                                   value="<?= $workerData->begin_time ?>"></td>
+                                   value="<?= $workerData->begin_time ?>" <?=$closed?"disabled":""?>></td>
                         <td><input required id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_end_time"
                                    onchange="recalculateHours('total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>')"
-                                   type="time" step="300" name="end_time" value="<?= $workerData->end_time ?>">
+                                   type="time" step="300" name="end_time"
+                                   value="<?= $workerData->end_time ?>" <?=$closed?"disabled":""?>>
                         </td>
                         <td><input
                                     id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_break_begin"
                                     onchange="recalculateHours('total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>')"
                                     type="time" step="300" name="break_begin"
-                                    value="<?= $workerData->break_begin ?>"></td>
+                                    value="<?= $workerData->break_begin ?>" <?=$closed?"disabled":""?>></td>
                         <td><input
                                     id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_break_end"
                                     onchange="recalculateHours('total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>')"
                                     type="time" step="300" name="break_end"
-                                    value="<?= $workerData->break_end ?>"></td>
+                                    value="<?= $workerData->break_end ?>" <?=$closed?"disabled":""?>></td>
                         <td id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>">00:00</td>
-                        <td><textarea required name="description"><?= $workerData->description ?></textarea>
+                        <td><textarea required name="description" <?=$closed?"disabled":""?>><?= $workerData->description ?></textarea>
                         </td>
                         <td>
                             <a class="btn btn-primary" data-toggle="collapse"
@@ -129,7 +131,7 @@ include "message_bar.php";
                                             <div class="col-8">
                                                 <input type="time" class="projects_<?=$day->day?>" name="projects[<?= $project->id ?>]"
                                                        id="project_<?= $worker->id . "_" . $day->day_of_week . "_" . $project->id ?>"
-                                                       value="<?= $projectData[$project->id] ?? null ?>">
+                                                       value="<?= $projectData[$project->id] ?? null ?> <?=$closed?"disabled":""?>">
                                             </div>
                                         </div>
                                         <?php
@@ -139,12 +141,12 @@ include "message_bar.php";
                             </div>
                         </td>
                         <td><input type="checkbox"
-                                   name="done" <?php if (date("Y-m-d") < $day->day) echo "disabled" ?> <?php if ($workerData->done) echo "checked" ?>>
+                                   name="done" <?php if (date("Y-m-d") < $day->day || $closed) echo "disabled" ?> <?php if ($workerData->done) echo "checked" ?>>
                         </td>
-                        <td id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>"><input required
+                        <td id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>"><?php if(!$closed){?><input required
                                                                                                type="submit"
                                                                                                class="btn btn-primary"
-                                                                                               value="Uložiť" ">
+                                                                                               value="Uložiť" "><?php }?>
                         </td>
                         <script>
                             document.getElementById("total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>").addEventListener("load", recalculateHours("total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>"))

@@ -25,7 +25,7 @@ class Service
      */
     public function GetAllWorkers(): array
     {
-        $result = $this->mysqli->query("SELECT name, surname, id, password_hash, member_since, is_admin FROM
+        $result = $this->mysqli->query("SELECT name, surname, id, password_hash, member_since, is_admin, email FROM
                                                                      workers");
         $retval = array();
         while ($row = $result->fetch_object("Worker")) {
@@ -66,6 +66,9 @@ class Service
         if($break_begin == "") $break_begin = null;
         if($break_end == "") $break_end = null;
         $worker_workday_id = 0;
+        if($this->WorkerHasDayClosed($worker_id, $workday_date)){
+            return false;
+        }
         $stmt = $this->mysqli->prepare("SELECT id FROM workers_workday WHERE worker_id=? and work_day_date=?");
         $stmt->bind_param("is", $worker_id, $workday_date);
         $stmt->execute();
@@ -365,11 +368,11 @@ class Service
         return $retval;
     }
 
-    public function CreateWorker($name, $surname, $member_since, $username): bool
+    public function CreateWorker($name, $surname, $member_since, $username, $email): bool
     {
-        $stmt = $this->mysqli->prepare("INSERT INTO workers (name, surname, member_since, username)
-            VALUES (?,?,?, ?)");
-        $stmt->bind_param("ssss", $name, $surname, $member_since, $username);
+        $stmt = $this->mysqli->prepare("INSERT INTO workers (name, surname, member_since, username, email)
+            VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssss", $name, $surname, $member_since, $username, $email);
         $stmt->execute();
         $id = $stmt->insert_id;
         $stmt = $this->mysqli->prepare("INSERT INTO default_days(work_day_number, worker_id, begin_time, end_time, break_begin, break_end, description) 
@@ -519,7 +522,8 @@ class Service
         return $result->fetch_object("Worker");
     }
 
-    public function CheckUserInCookies($username, $cookie){
+    public function CheckUserInCookies($username, $cookie): bool
+    {
         $sql = "SELECT * FROM user_cookies WHERE username=? AND cookie=?";
         $stmt = $this->mysqli->prepare($sql);
         $stmt->bind_param("ss", $username, $cookie);
@@ -530,6 +534,10 @@ class Service
         return false;
     }
 
+    /**
+     * @param $id
+     * @return Worker
+     */
     public function GetWorkerWithId($id){
         $sql = "SELECT * FROM workers WHERE id=?";
         $stmt = $this->mysqli->prepare($sql);
@@ -561,6 +569,10 @@ class Service
         return $retval;
     }
 
+    public function WorkerHasDayClosed($worker_id, $day):bool{
+        return $this->WorkerHasMonthClosed($worker_id, date("Y-m", strtotime($day)));
+    }
+
     public function WorkerHasMonthClosed($worker_id, $month):bool{
         $sql = "SELECT * FROM closed_months WHERE worker_id=? AND month=? AND to_be_reworked=0";
         $stmt = $this->mysqli->prepare($sql);
@@ -572,6 +584,31 @@ class Service
 
     public function CloseMonthForWorker($worker_id, $month){
         $sql = "INSERT INTO closed_months(worker_id, month) VALUES (?,?)";
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("is", $worker_id, $month);
+        $stmt->execute();
+        return $stmt->errno;
+    }
+
+    public function WorkerHasMonthForRework($worker_id, $month):bool{
+        $sql = "SELECT * FROM closed_months WHERE worker_id=? AND month=? AND to_be_reworked=1";
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("is", $worker_id, $month);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->num_rows > 0;
+    }
+
+    public function SetWorkerMonthForRework($worker_id, $month){
+        $sql = "UPDATE closed_months SET to_be_reworked=1 WHERE worker_id=? AND month=?";
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("is", $worker_id, $month);
+        $stmt->execute();
+        return $stmt->errno;
+    }
+
+    public function MarkWorkerMonthAsReworked($worker_id, $month){
+        $sql = "UPDATE closed_months SET to_be_reworked=0 WHERE worker_id=? AND month=?";
         $stmt = $this->mysqli->prepare($sql);
         $stmt->bind_param("is", $worker_id, $month);
         $stmt->execute();

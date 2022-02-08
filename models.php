@@ -2,6 +2,7 @@
 class Worker{
     public string $name;
     public string $surname;
+    public string $email;
     public string $member_since;
     public int $id;
     public bool $is_admin;

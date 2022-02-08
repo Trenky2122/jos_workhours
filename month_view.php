@@ -5,16 +5,15 @@ include_once "service.php";
 $service = new Service();
 $worker_id = $_GET["id"];
 $worker_name = $service->GetWorkerNameWithId($worker_id);
-$year = substr($_GET["m"],0,4);
-$month = substr($_GET["m"],5,2);
+$year = substr($_GET["m"], 0, 4);
+$month = substr($_GET["m"], 5, 2);
 
 $list_of_dates = array();
-$list_of_days = ["Mon"=>"pondelok", "Tue"=>"utorok", "Wed"=>"streda", "Thu"=>"štvrtok", "Fri"=>"piatok", "Sat"=>"sobota", "Sun"=>"nedeľa"];
-$start_date = "01-".$month."-".$year;
+$list_of_days = ["Mon" => "pondelok", "Tue" => "utorok", "Wed" => "streda", "Thu" => "štvrtok", "Fri" => "piatok", "Sat" => "sobota", "Sun" => "nedeľa"];
+$start_date = "01-" . $month . "-" . $year;
 $start_time = strtotime($start_date);
 $end_time = strtotime("+1 month", $start_time);
-for($i=$start_time; $i<$end_time; $i+=86400)
-{
+for ($i = $start_time; $i < $end_time; $i += 86400) {
     array_push($list_of_dates, array(date('d.m.Y', $i), date('D', $i), date("Y-m-d", $i)));
 }
 $done_days = $service->GetDoneWorkerWorkDays($worker_id, $month, $year);
@@ -28,9 +27,9 @@ include "message_bar.php";
         </div>
         <div class="col-3">
             <form method="get" action="month_view.php">
-                <input type="hidden" name="id" value="<?=$worker_id?>">
+                <input type="hidden" name="id" value="<?= $worker_id ?>">
                 <label for="month" class="mb-1">mesiac/rok:</label>
-                <input type="month" class="mb-1" id="month" name="m" value="<?=$_GET["m"]?>">
+                <input type="month" class="mb-1" id="month" name="m" value="<?= $_GET["m"] ?>">
                 <input type="submit" name="submit" value="Hľadať">
             </form>
         </div>
@@ -40,86 +39,88 @@ include "message_bar.php";
         <div class="col-12">
             <table id="example" style="width: ">
                 <thead>
-                    <tr>
-                        <td colspan="6" rowspan="3">Mesiac: <?= $month ?>/<?= $year ?></td>
-                        <td colspan="3" class="last">Pracovný čas</td>
-                    </tr>
-                    <tr>
-                        <td colspan="3" class="last">Firma: JOS GROUP s.r.o.</td>
-                    </tr>
-                    <tr>
-                        <td colspan="3" class="last">Zamestnanec: <?= $worker_name ?></td>
-                    </tr>
-                    <tr>
-                        <th scope="col" class="sun">Mesiac</th>
-                        <th scope="col" class="sun">Deň</th>
-                        <th scope="col" class="sun">Začiatočný čas</th>
-                        <th scope="col" class="sun">Konečný čas</th>
-                        <th scope="col" class="sun">Pauza</th>
-                        <th scope="col" class="sun">Celkový čas</th>
-                        <th scope="col" class="sun">Náplň práce</th>
-                        <th scope="col" class="sun last">Projekt</th>
-                    </tr>
+                <tr>
+                    <td colspan="6" rowspan="3">Mesiac: <?= $month ?>/<?= $year ?></td>
+                    <td colspan="3" class="last">Pracovný čas</td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="last">Firma: JOS GROUP s.r.o.</td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="last">Zamestnanec: <?= $worker_name ?></td>
+                </tr>
+                <tr>
+                    <th scope="col" class="sun">Mesiac</th>
+                    <th scope="col" class="sun">Deň</th>
+                    <th scope="col" class="sun">Začiatočný čas</th>
+                    <th scope="col" class="sun">Konečný čas</th>
+                    <th scope="col" class="sun">Pauza</th>
+                    <th scope="col" class="sun">Celkový čas</th>
+                    <th scope="col" class="sun">Náplň práce</th>
+                    <th scope="col" class="sun last">Projekt</th>
+                </tr>
                 </thead>
                 <tbody>
-                    <?php
-                        foreach ($list_of_dates as $date_day){
-                            $date = $date_day[0];
-                            $day = $list_of_days[$date_day[1]];
-                            $date2 = date('Y-m-d', strtotime($date));
-                            $row = array();
-                            if(isset($done_days[$date2])) {
-                                $row = $done_days[$date2];
-                            }
-                            else {
-                                $row['id']=-1;
-                                $row['begin_time'] = null;
-                                $row['end_time'] = null;
-                                $row['break_begin'] = null;
-                                $row['break_end'] = null;
-                                $row['project'] = null;
-                                $row['description'] = null;
-                            }
-                            if($day == 'nedeľa')
-                                $class = 'sun';
-                            else
-                                $class = 'ord';
-                            echo("<tr><td class='".$class."'>".$date."</td>");
-                            echo("<td class='".$class."'>".$day."</td>");
-                            echo("<td class='".$class."'>".substr($row['begin_time'], 0, 5)."</td>");
-                            echo("<td class='".$class."'>".substr($row['end_time'], 0, 5)."</td>");
-                            $pause=$service->CalculateDayTime($row["break_begin"], $row["break_end"], null, null);
-                            echo("<td class='".$class."'>".$pause."</td>");
-                            $day_time = $service->CalculateDayTime($row['begin_time'], $row['end_time'], $row['break_begin'], $row['break_end']);
-                            $total_time[] = $day_time;
-                            echo("<td class='".$class." total'>".$day_time."</td>");
-                            echo("<td class='".$class."'>".$row['description']."</td>");
-                            echo("<td class='".$class." last'>".($row["id"]==-1?"":$service->GetProjectsStringForWorkersWorkday($row["id"]))."</td>");
-                            echo("</tr>");
+                <?php
+                foreach ($list_of_dates as $date_day) {
+                    $date = $date_day[0];
+                    $day = $list_of_days[$date_day[1]];
+                    $date2 = date('Y-m-d', strtotime($date));
+                    $row = array();
+                    if (isset($done_days[$date2])) {
+                        $row = $done_days[$date2];
+                    } else {
+                        $row['id'] = -1;
+                        $row['begin_time'] = null;
+                        $row['end_time'] = null;
+                        $row['break_begin'] = null;
+                        $row['break_end'] = null;
+                        $row['project'] = null;
+                        $row['description'] = null;
+                    }
+                    if ($day == 'nedeľa')
+                        $class = 'sun';
+                    else
+                        $class = 'ord';
+                    echo("<tr><td class='" . $class . "'>" . $date . "</td>");
+                    echo("<td class='" . $class . "'>" . $day . "</td>");
+                    echo("<td class='" . $class . "'>" . substr($row['begin_time'], 0, 5) . "</td>");
+                    echo("<td class='" . $class . "'>" . substr($row['end_time'], 0, 5) . "</td>");
+                    $pause = $service->CalculateDayTime($row["break_begin"], $row["break_end"], null, null);
+                    echo("<td class='" . $class . "'>" . $pause . "</td>");
+                    $day_time = $service->CalculateDayTime($row['begin_time'], $row['end_time'], $row['break_begin'], $row['break_end']);
+                    $total_time[] = $day_time;
+                    echo("<td class='" . $class . " total'>" . $day_time . "</td>");
+                    echo("<td class='" . $class . "'>" . $row['description'] . "</td>");
+                    echo("<td class='" . $class . " last'>" . ($row["id"] == -1 ? "" : $service->GetProjectsStringForWorkersWorkday($row["id"])) . "</td>");
+                    echo("</tr>");
+                }
+                ?>
+                <tr>
+                    <td colspan="5" class="sum"><strong>Suma:</strong></td>
+                    <td class="sum"><strong><?= $service->CalculateTotalTime($total_time) ?></strong></td>
+                    <td class="sum" colspan="2">
+                        <?php
+                        $projectData = $service->GetProjectDataForWorker($worker_id, $list_of_dates[0][2], end($list_of_dates)[2]);
+                        foreach ($projectData as $key => $value) {
+                            echo "<strong>" . $key . "</strong>: " . $value . "&emsp;&emsp;&emsp;&emsp;";
                         }
-                    ?>
-                    <tr>
-                        <td colspan="5" class="sum"><strong>Suma:</strong></td>
-                        <td class="sum"><strong><?=$service->CalculateTotalTime($total_time)?></strong></td>
-                        <td class="sum" colspan="2">
-                            <?php
-                            $projectData = $service->GetProjectDataForWorker($worker_id, $list_of_dates[0][2], end($list_of_dates)[2]);
-                            foreach ($projectData as $key=>$value){
-                                echo "<strong>".$key."</strong>: ".$value."&emsp;&emsp;&emsp;&emsp;";
-                            }
-                            ?></td>
-                    </tr>
-                    <tr>
-                    </tr>
-                    <tr>
-                        <td colspan="3" style='border: none;'>Dátum: <?=$list_of_dates[count($list_of_dates) - 1][0]?></td>
-                        <td colspan="3" style='border: none;'>Podpis zamestnanca</td>
-                        <td colspan="2" style='border: none;border-right: 2px solid black;'>Pečiatka a podpis zamestnávateľa</td>
-                    </tr>
-                    <tr>
-                        <td colspan="8" style="border: none; padding: 20px;border-right: 2px solid black;">
-                        </td>
-                    </tr>
+                        ?></td>
+                </tr>
+                <tr>
+                </tr>
+                <tr>
+                    <td colspan="3" style='border: none;'>
+                        Dátum: <?= $list_of_dates[count($list_of_dates) - 1][0] ?></td>
+                    <td colspan="3" style='border: none;'>Podpis zamestnanca</td>
+                    <td colspan="2" style='border: none;border-right: 2px solid black;'>Pečiatka a podpis
+                        zamestnávateľa
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="8" style="border: none; padding: 20px;border-right: 2px solid black;">
+                    </td>
+                </tr>
                 </tbody>
             </table>
         </div>
@@ -128,64 +129,108 @@ include "message_bar.php";
         <div class="col-1">
             <button class="btn btn-primary" id="pdf" onclick="window.print()">Export</button>
         </div>
-        <div class="col-6">
-            <?php if(!($closed=$service->WorkerHasMonthClosed($worker_id, $_GET["m"]))&&($_SESSION["user_id"]==$worker_id || $_SESSION["user_role"]==1)){?>
-            <form action="submit_close_month.php" method="post">
-                <input type="hidden" value="<?=$worker_id?>" name="worker_id">
-                <input type="hidden" value="<?=$_GET["m"]?>" name="month">
-                <input class="btn btn-primary" name="submit" value="Uzavrieť mesiac" type="submit">
-            </form>
-            <?php } else if($closed){?>
+        <?php
+        $rework = false;
+        if (!($closed = $service->WorkerHasMonthClosed($worker_id, $_GET["m"])) && !($rework = $service->WorkerHasMonthForRework($worker_id, $_GET["m"])) && ($_SESSION["user_id"] == $worker_id || $_SESSION["user_role"] == 1)) { ?>
+            <div class="col-4">
+                <form action="submit_close_month.php" method="post">
+                    <input type="hidden" value="<?= $worker_id ?>" name="worker_id">
+                    <input type="hidden" value="<?= $_GET["m"] ?>" name="month">
+                    <input class="btn btn-primary" name="submit" value="Uzavrieť mesiac" type="submit">
+                </form>
+            </div>
+        <?php } else if ($closed) { ?>
+            <div class="col-3">
                 <div class="alert alert-info" role="alert">
                     Mesiac bol uzavretý.
                 </div>
-        <?php } ?>
-        </div>
+            </div>
+            <?php
+            if ($_SESSION["user_role"] == 1) {
+                ?>
+                <div class="col-4">
+                    <form action="submit_rework_month.php" method="post">
+                        <div class="container-fluid">
+                            <input type="hidden" value="<?= $worker_id ?>" name="worker_id">
+                            <input type="hidden" value="<?= $_GET["m"] ?>" name="month">
+                            <div class="row">
+                                <div class="col-6">
+                                    <label for="explanation" style="float: right">Zdôvodnenie:</label>
+                                </div>
+                                <div class="col-6">
+                                    <textarea name="explanation" id="explanation"></textarea>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6"></div>
+                                <div class="col-6"><input class="btn btn-primary" name="submit"
+                                                          value="Poslať mesiac na opravu" type="submit"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <?php
+            }
+        }
+        if ($rework) {
+            ?>
+            <div class="col-2">
+                <form action="submit_close_month_correction.php" method="post">
+                    <input type="hidden" value="<?= $worker_id ?>" name="worker_id">
+                    <input type="hidden" value="<?= $_GET["m"] ?>" name="month">
+                    <input class="btn btn-primary" name="submit" value="Uzavrieť mesiac (oprava)" type="submit">
+                </form>
+            </div>
+            <?php
+        }
+        ?>
     </div>
 
 
     <style>
-        th, td{
+        th, td {
             padding: 5px;
             text-align: left;
             border: 1px solid black;
         }
 
-        table{
+        table {
             border: solid black;
             font-size: small;
         }
 
-        .sun{
+        .sun {
             border-bottom: 2px solid black;
         }
 
-        .ord{
+        .ord {
             border-bottom: 1px solid black;
         }
 
-        .total{
+        .total {
             border-left: 2px solid black;
             border-right: 2px solid black;
         }
 
-        .sum{
+        .sum {
             border: 2px solid black;
         }
 
-        .last{
+        .last {
             border-right: 2px solid black;
         }
 
-        @media print{
-            th, td{
+        @media print {
+            th, td {
                 padding: 1px;
             }
-            table{
+
+            table {
                 border: solid black;
                 font-size: 8px;
                 margin-top: -50px;
             }
+
             .noprint {
                 visibility: hidden;
             }
