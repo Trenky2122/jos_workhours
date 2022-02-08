@@ -262,6 +262,8 @@ class Service
         $m = intval($totaltime / 60);
         if($m < 10)
             $m = "0".$m;
+        if($h < 10)
+            $h = "0".$h;
         return "$h:$m";
     }
 
@@ -277,6 +279,25 @@ class Service
         $min = $total % 60;
         $hrs = floor($total / 60);
         return ($hrs<10?"0":"")."$hrs:".($min<10?"0":"")."$min";
+    }
+
+    public function GetReducedTimeTo80($original_time, $overflow_time):string{
+        $minutes_orig = $this->GetMinutesFromHHMM($original_time);
+        $minutes_overflow = $this->GetMinutesFromHHMM($overflow_time);
+        $minutes_wanted = $this->GetMinutesFromHHMM("80:00");
+        $result_minutes = $minutes_orig-($minutes_overflow - $minutes_wanted);
+        $h = floor($result_minutes/60);
+        $m = $result_minutes % 60;
+        if($m < 10)
+            $m = "0".$m;
+        if($h < 10)
+            $h = "0".$h;
+        return "$h:$m";
+    }
+
+    public function GetMinutesFromHHMM($time):int{
+        $split = explode(':', $time);
+        return intval($split[0])*60 + intval($split[1]);
     }
 
     /**

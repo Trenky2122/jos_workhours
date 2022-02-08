@@ -18,6 +18,9 @@ for ($i = $start_time; $i < $end_time; $i += 86400) {
 }
 $done_days = $service->GetDoneWorkerWorkDays($worker_id, $month, $year);
 $total_time = array();
+$sum_unitl_now = "00:00";
+$overflow=false;
+$set_overflow=false;
 include "message_bar.php";
 ?>
 
@@ -26,7 +29,7 @@ include "message_bar.php";
             <a href="index.php" class="btn btn-primary"> späť</a>
         </div>
         <div class="col-3">
-            <form method="get" action="month_view.php">
+            <form method="get" action="month_view_80.php">
                 <input type="hidden" name="id" value="<?= $worker_id ?>">
                 <label for="month" class="mb-1">mesiac/rok:</label>
                 <input type="month" class="mb-1" id="month" name="m" value="<?= $_GET["m"] ?>">
@@ -63,6 +66,8 @@ include "message_bar.php";
                 <tbody>
                 <?php
                 foreach ($list_of_dates as $date_day) {
+                    if($set_overflow)
+                        $overflow=true;
                     $date = $date_day[0];
                     $day = $list_of_days[$date_day[1]];
                     $date2 = date('Y-m-d', strtotime($date));
@@ -82,30 +87,37 @@ include "message_bar.php";
                         $class = 'sun';
                     else
                         $class = 'ord';
+                    if(!$overflow) {
+                        $day_time = $service->CalculateDayTime($row['begin_time'], $row['end_time'], $row['break_begin'], $row['break_end']);
+                        $sum_unitl_now = $service->CalculateTotalTime(array($day_time, $sum_unitl_now));
+                        if ($sum_unitl_now >= "80:00") {
+                            $day_time = $service->GetReducedTimeTo80($day_time, $sum_unitl_now);
+                            $sum_unitl_now = "80:00";
+                            $set_overflow = true;
+                            $row["break_begin"] = null;
+                            $row["break_end"] = null;
+                            $row["end_time"] = "16:00:00";
+                            $row["begin_time"] = $service->CalculateDayTime($day_time.":00", "16:00:00", null, null);
+                        }
+                        $total_time[] = $day_time;
+                    }
                     echo("<tr><td class='" . $class . "'>" . $date . "</td>");
                     echo("<td class='" . $class . "'>" . $day . "</td>");
-                    echo("<td class='" . $class . "'>" . substr($row['begin_time'], 0, 5) . "</td>");
-                    echo("<td class='" . $class . "'>" . substr($row['end_time'], 0, 5) . "</td>");
+                    echo("<td class='" . $class . "'>" . ($overflow ? "" :substr($row['begin_time'], 0, 5) ). "</td>");
+                    echo("<td class='" . $class . "'>" . ($overflow ? "" :substr($row['end_time'], 0, 5)) . "</td>");
                     $pause = $service->CalculateDayTime($row["break_begin"], $row["break_end"], null, null);
-                    echo("<td class='" . $class . "'>" . $pause . "</td>");
-                    $day_time = $service->CalculateDayTime($row['begin_time'], $row['end_time'], $row['break_begin'], $row['break_end']);
-                    $total_time[] = $day_time;
-                    echo("<td class='" . $class . " total'>" . $day_time . "</td>");
-                    echo("<td class='" . $class . "'>" . $row['description'] . "</td>");
-                    echo("<td class='" . $class . " last'>" . ($row["id"] == -1 ? "" : $service->GetProjectsStringForWorkersWorkday($row["id"])) . "</td>");
+                    echo("<td class='" . $class . "'>" . ($overflow ? "" :$pause) . "</td>");
+
+                    echo("<td class='" . $class . " total'>" . ($overflow ? "" :$day_time) . "</td>");
+                    echo("<td class='" . $class . "'>" . ($overflow ? "" :$row['description']) . "</td>");
+                    echo("<td class='" . $class . " last'>" . ($overflow ? "" :($row["id"] == -1 ? "" : $service->GetProjectsStringForWorkersWorkday($row["id"]))) . "</td>");
                     echo("</tr>");
                 }
                 ?>
                 <tr>
                     <td colspan="5" class="sum"><strong>Suma:</strong></td>
                     <td class="sum"><strong><?= $service->CalculateTotalTime($total_time) ?></strong></td>
-                    <td class="sum" colspan="2">
-                        <?php
-                        $projectData = $service->GetProjectDataForWorker($worker_id, $list_of_dates[0][2], end($list_of_dates)[2]);
-                        foreach ($projectData as $key => $value) {
-                            echo "<strong>" . $key . "</strong>: " . $value . "&emsp;&emsp;&emsp;&emsp;";
-                        }
-                        ?></td>
+                    <td class="sum" colspan="2"></td>
                 </tr>
                 <tr>
                 </tr>
@@ -129,64 +141,6 @@ include "message_bar.php";
         <div class="col-1">
             <button class="btn btn-primary" id="pdf" onclick="window.print()">Export</button>
         </div>
-        <div class="col-1">
-            <a class="btn btn-primary" href="month_view_80.php?id=<?=$worker_id?>&m=<?=$_GET["m"]?>">80 hodinová verzia</a>
-        </div>
-        <?php
-        $rework = false;
-        if (!($closed = $service->WorkerHasMonthClosed($worker_id, $_GET["m"])) && !($rework = $service->WorkerHasMonthForRework($worker_id, $_GET["m"])) && ($_SESSION["user_id"] == $worker_id || $_SESSION["user_role"] == 1)) { ?>
-            <div class="col-4">
-                <form action="submit_close_month.php" method="post">
-                    <input type="hidden" value="<?= $worker_id ?>" name="worker_id">
-                    <input type="hidden" value="<?= $_GET["m"] ?>" name="month">
-                    <input class="btn btn-primary" name="submit" value="Uzavrieť mesiac" type="submit">
-                </form>
-            </div>
-        <?php } else if ($closed) { ?>
-            <div class="col-3">
-                <div class="alert alert-info" role="alert">
-                    Mesiac bol uzavretý.
-                </div>
-            </div>
-            <?php
-            if ($_SESSION["user_role"] == 1) {
-                ?>
-                <div class="col-4">
-                    <form action="submit_rework_month.php" method="post">
-                        <div class="container-fluid">
-                            <input type="hidden" value="<?= $worker_id ?>" name="worker_id">
-                            <input type="hidden" value="<?= $_GET["m"] ?>" name="month">
-                            <div class="row">
-                                <div class="col-6">
-                                    <label for="explanation" style="float: right">Zdôvodnenie:</label>
-                                </div>
-                                <div class="col-6">
-                                    <textarea name="explanation" id="explanation"></textarea>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-6"></div>
-                                <div class="col-6"><input class="btn btn-primary" name="submit"
-                                                          value="Poslať mesiac na opravu" type="submit"></div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <?php
-            }
-        }
-        if ($rework) {
-            ?>
-            <div class="col-2">
-                <form action="submit_close_month_correction.php" method="post">
-                    <input type="hidden" value="<?= $worker_id ?>" name="worker_id">
-                    <input type="hidden" value="<?= $_GET["m"] ?>" name="month">
-                    <input class="btn btn-primary" name="submit" value="Uzavrieť mesiac (oprava)" type="submit">
-                </form>
-            </div>
-            <?php
-        }
-        ?>
     </div>
 
 
