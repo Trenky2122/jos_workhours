@@ -129,9 +129,9 @@ include "message_bar.php";
                                                 <label for="project_<?= $worker->id . "_" . $day->day_of_week . "_" . $project->id ?>"><?= $project->name ?></label>
                                             </div>
                                             <div class="col-8">
-                                                <input type="time" class="projects_<?=$day->day?>" name="projects[<?= $project->id ?>]"
+                                                <input step="300" type="time" class="projects_<?=$day->day?>" name="projects[<?= $project->id ?>]"
                                                        id="project_<?= $worker->id . "_" . $day->day_of_week . "_" . $project->id ?>"
-                                                       value="<?= $projectData[$project->id] ?? null ?> <?=$closed?"disabled":""?>">
+                                                       value="<?= $projectData[$project->id] ?? null ?>" <?=$closed?"disabled":""?>>
                                             </div>
                                         </div>
                                         <?php
