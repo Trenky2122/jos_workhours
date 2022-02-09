@@ -26,7 +26,7 @@ include "message_bar.php";
 
     <div class="row noprint mb-1" style="margin-top: 1em">
         <div class="col-1">
-            <a href="index.php" class="btn btn-primary"> späť</a>
+            <a href="month_view.php?id=<?=$worker_id?>&m=<?=$_GET["m"]?>" class="btn btn-primary"> späť</a>
         </div>
         <div class="col-3">
             <form method="get" action="month_view_80.php">
