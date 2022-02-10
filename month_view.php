@@ -9,7 +9,7 @@ $year = substr($_GET["m"], 0, 4);
 $month = substr($_GET["m"], 5, 2);
 
 $list_of_dates = array();
-$list_of_days = ["Mon" => "pondelok", "Tue" => "utorok", "Wed" => "streda", "Thu" => "štvrtok", "Fri" => "piatok", "Sat" => "sobota", "Sun" => "nedeľa"];
+$list_of_days = ["Mon" => "po", "Tue" => "ut", "Wed" => "st", "Thu" => "št", "Fri" => "pi", "Sat" => "so", "Sun" => "ne"];
 $start_date = "01-" . $month . "-" . $year;
 $start_time = strtotime($start_date);
 $end_time = strtotime("+1 month", $start_time);
@@ -37,27 +37,27 @@ include "message_bar.php";
 
     <div class="row">
         <div class="col-12">
-            <table id="example" style="width: ">
+            <table id="example" class="export_table">
                 <thead>
                 <tr>
-                    <td colspan="6" rowspan="3">Mesiac: <?= $month ?>/<?= $year ?></td>
-                    <td colspan="3" class="last">Pracovný čas</td>
+                    <td colspan="6" rowspan="3" class="export_table_cell">Mesiac: <?= $month ?>/<?= $year ?></td>
+                    <td colspan="3" class="last export_table_cell">Pracovný čas</td>
                 </tr>
                 <tr>
-                    <td colspan="3" class="last">Firma: JOS GROUP s.r.o.</td>
+                    <td colspan="3" class="last export_table_cell">Firma: JOS GROUP s.r.o.</td>
                 </tr>
                 <tr>
-                    <td colspan="3" class="last">Zamestnanec: <?= $worker_name ?></td>
+                    <td colspan="3" class="last export_table_cell">Zamestnanec: <?= $worker_name ?></td>
                 </tr>
                 <tr>
-                    <th scope="col" class="sun">Mesiac</th>
-                    <th scope="col" class="sun">Deň</th>
-                    <th scope="col" class="sun">Začiatočný čas</th>
-                    <th scope="col" class="sun">Konečný čas</th>
-                    <th scope="col" class="sun">Pauza</th>
-                    <th scope="col" class="sun">Celkový čas</th>
-                    <th scope="col" class="sun">Náplň práce</th>
-                    <th scope="col" class="sun last">Projekt</th>
+                    <th scope="col" class="sun export_table_cell">Dátum</th>
+                    <th scope="col" class="sun export_table_cell">Deň</th>
+                    <th scope="col" class="sun export_table_cell">Začiatok</th>
+                    <th scope="col" class="sun export_table_cell">Koniec</th>
+                    <th scope="col" class="sun export_table_cell">Pauza</th>
+                    <th scope="col" class="sun export_table_cell">Celkom</th>
+                    <th scope="col" class="sun export_table_cell">Náplň práce</th>
+                    <th scope="col" class="sun last export_table_cell">Projekt</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -82,24 +82,25 @@ include "message_bar.php";
                         $class = 'sun';
                     else
                         $class = 'ord';
-                    echo("<tr><td class='" . $class . "'>" . $date . "</td>");
-                    echo("<td class='" . $class . "'>" . $day . "</td>");
-                    echo("<td class='" . $class . "'>" . substr($row['begin_time'], 0, 5) . "</td>");
-                    echo("<td class='" . $class . "'>" . substr($row['end_time'], 0, 5) . "</td>");
+                    echo("<tr><td class='export_table_cell " . $class . "'>" . $date . "</td>");
+                    echo("<td class='export_table_cell " . $class . "'>" . $day . "</td>");
+                    echo("<td class='export_table_cell " . $class . "'>" . substr($row['begin_time'], 0, 5) . "</td>");
+                    echo("<td class='export_table_cell " . $class . "'>" . substr($row['end_time'], 0, 5) . "</td>");
                     $pause = $service->CalculateDayTime($row["break_begin"], $row["break_end"], null, null);
-                    echo("<td class='" . $class . "'>" . $pause . "</td>");
+                    echo("<td class='export_table_cell " . $class . "'>" . $pause . "</td>");
                     $day_time = $service->CalculateDayTime($row['begin_time'], $row['end_time'], $row['break_begin'], $row['break_end']);
                     $total_time[] = $day_time;
-                    echo("<td class='" . $class . " total'>" . $day_time . "</td>");
-                    echo("<td class='" . $class . "'>" . $row['description'] . "</td>");
-                    echo("<td class='" . $class . " last'>" . ($row["id"] == -1 ? "" : $service->GetProjectsStringForWorkersWorkday($row["id"])) . "</td>");
+                    echo("<td class='export_table_cell " . $class . " total'>" . $day_time . "</td>");
+                    echo("<td class='export_table_cell " . $class . "'>" . $row['description'] . "</td>");
+                    echo("<td class='export_table_cell " . $class . " last'>" . ($row["id"] == -1 ? "" : $service->GetProjectsStringForWorkersWorkday($row["id"])) . "</td>");
                     echo("</tr>");
                 }
                 ?>
                 <tr>
-                    <td colspan="5" class="sum"><strong>Suma:</strong></td>
-                    <td class="sum"><strong><?= $service->CalculateTotalTime($total_time) ?></strong></td>
-                    <td class="sum" colspan="2">
+                    <td colspan="5" class="sum export_table_cell"><strong>Suma:</strong></td>
+                    <td class="sum export_table_cell"><strong><?= $service->CalculateTotalTime($total_time) ?></strong>
+                    </td>
+                    <td class="sum export_table_cell" colspan="2">
                         <?php
                         $projectData = $service->GetProjectDataForWorker($worker_id, $list_of_dates[0][2], end($list_of_dates)[2]);
                         foreach ($projectData as $key => $value) {
@@ -108,17 +109,18 @@ include "message_bar.php";
                         ?></td>
                 </tr>
                 <tr>
-                </tr>
-                <tr>
-                    <td colspan="3" style='border: none;'>
+                    <td colspan="3" class="export_table_cell bot-three"
+                        style='border-right: none;border-top: none;border-bottom: none;'>
                         Dátum: <?= $list_of_dates[count($list_of_dates) - 1][0] ?></td>
-                    <td colspan="3" style='border: none;'>Podpis zamestnanca</td>
-                    <td colspan="2" style='border: none;border-right: 2px solid black;'>Pečiatka a podpis
+                    <td colspan="3" class="export_table_cell" style='border: none;'>Podpis zamestnanca</td>
+                    <td colspan="2" class="export_table_cell last"
+                        style='border-left: none;border-top: none;border-bottom: none'>Pečiatka a podpis
                         zamestnávateľa
                     </td>
                 </tr>
                 <tr>
-                    <td colspan="8" style="border: none; padding: 20px;border-right: 2px solid black;">
+                    <td colspan="8" class="export_table_cell last sun bot-three"
+                        style="border-top: none; padding: 20px;border-right: 2px solid black;">
                     </td>
                 </tr>
                 </tbody>
@@ -130,7 +132,8 @@ include "message_bar.php";
             <button class="btn btn-primary" id="pdf" onclick="window.print()">Export</button>
         </div>
         <div class="col-1">
-            <a class="btn btn-primary" href="month_view_80.php?id=<?=$worker_id?>&m=<?=$_GET["m"]?>">80 hodinová verzia</a>
+            <a class="btn btn-primary" href="month_view_80.php?id=<?= $worker_id ?>&m=<?= $_GET["m"] ?>">80 hodinová
+                verzia</a>
         </div>
         <?php
         $rework = false;
@@ -188,57 +191,5 @@ include "message_bar.php";
         }
         ?>
     </div>
-
-
-    <style>
-        th, td {
-            padding: 5px;
-            text-align: left;
-            border: 1px solid black;
-        }
-
-        table {
-            border: solid black;
-            font-size: small;
-        }
-
-        .sun {
-            border-bottom: 2px solid black;
-        }
-
-        .ord {
-            border-bottom: 1px solid black;
-        }
-
-        .total {
-            border-left: 2px solid black;
-            border-right: 2px solid black;
-        }
-
-        .sum {
-            border: 2px solid black;
-        }
-
-        .last {
-            border-right: 2px solid black;
-        }
-
-        @media print {
-            th, td {
-                padding: 1px;
-            }
-
-            table {
-                border: solid black;
-                font-size: 8px;
-                margin-top: -50px;
-            }
-
-            .noprint {
-                visibility: hidden;
-            }
-        }
-    </style>
-
 <?php
 include "footer.php";

@@ -1,0 +1,77 @@
+
+.export_table_cell {
+    padding: 5px;
+    text-align: left;
+    border: 1px solid black;
+}
+
+.export_table {
+    border: solid black;
+    font-size: small;
+}
+
+.sun {
+    border-bottom: 2px solid black;
+}
+
+.ord {
+    border-bottom: 1px solid black;
+}
+
+.total {
+    border-left: 2px solid black;
+    border-right: 2px solid black;
+}
+
+.sum {
+    border: 2px solid black;
+}
+
+.last {
+    border-right: 2px solid black;
+}
+
+.bot-three{
+    border-left: 2px solid black;
+}
+
+@media print {
+    .export_table_cell {
+        padding: 1px;
+    }
+
+    .export_table {
+        border: none;
+        font-size: 12px;
+        margin-top: -100px;
+    }
+
+    .sun {
+        border-bottom: 1px solid black !important;
+    }
+
+    .sum {
+        border: 1px solid black !important;
+    }
+
+    .last {
+        border-right: 1px solid black !important;
+    }
+
+    .total {
+        border-left: 1px solid black !important;
+        border-right: 1px solid black !important;
+    }
+
+    .noprint {
+        visibility: hidden;
+    }
+
+    .bot-three{
+        border-left: 1px solid black;
+    }
+
+    .headline{
+        font-size: 16px;
+    }
+}
