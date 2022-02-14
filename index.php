@@ -23,13 +23,21 @@ if (isset($_GET['w'])) {
     $week = $arr[1];
     $year = $arr[0];
 }
+elseif (isset($_GET['d'])){
+    if(!(bool)strtotime($_GET['d'])){
+        die("Bad format date: " . $_GET["d"]);
+    }
+    $year = date("Y", strtotime($_GET['d']));
+    $month = date("m", strtotime($_GET['d']));
+    $week = date("W", strtotime($_GET['d']));
+}
 
 $days = $service->GetDaysInWeek($year, $week);
 $worker = $service->GetWorkerWithId($_SESSION["user_id"]);
 $list_of_days = ["Mon" => "Pondelok", "Tue" => "Utorok", "Wed" => "Streda", "Thu" => "Štvrtok", "Fri" => "Piatok", "Sat" => "Sobota", "Sun" => "Nedeľa"];
 include "message_bar.php";
 ?>
-<div class="row mt-1">
+<div class="row mt-1 d-none d-xl-flex">
     <div class="col-6">
         <form method="get" action="index.php">
             <div class="container-fluid">
@@ -46,73 +54,95 @@ include "message_bar.php";
         </form>
     </div>
 </div>
+<div class="row mt-1 d-xl-none">
+    <div class="col-12">
+        <form method="get" action="index.php">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-10">
+                        <label for="day">Týždeň (ľubovoľný deň z neho):</label>
+                        <input type="date" id="day" name="d">
+                    </div>
+                    <div class="col-2">
+                        <input type="submit" name="submit" value="Hľadať">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="row worker_<?= $worker->id ?> worker_name mb-1">
+    <h1><strong><?= $worker->GetFullName() ?></strong></h1>
+    <div class="col-4"><a href="default_change.php?id=<?= $worker->id ?>" class="btn btn-primary">Upraviť
+            default</a></div>
+    <div class="col-4"><a href="password_change.php?id=<?= $worker->id ?>" class="btn btn-primary">
+            Zmeniť
+            heslo</a></div>
+    <div class="col-4"><a href="month_view.php?id=<?= $worker->id ?>&m=<?= $year ?>-<?= $month ?>"
+                             class="btn btn-primary">Mesačný prehľad</a></div>
+</div>
 <div class="row">
     <div class="col" style="overflow-x: auto">
-        <table class="table table-stripped">
-            <thead>
-            <tr>
-                <th>Deň</th>
-                <th>Začiatočný čas</th>
-                <th>Konečný čas</th>
-                <th>Začiatok pauzy</th>
-                <th>Koniec pauzy</th>
-                <th>Celkový čas</th>
-                <th>Náplň práce</th>
-                <th>Projekt</th>
-                <th>Vykonané</th>
-                <th>Odoslať</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr class="table-row worker_<?= $worker->id ?> worker_name">
-                <td><strong><?= $worker->GetFullName() ?></strong></td>
-                <td colspan="2"><a href="default_change.php?id=<?= $worker->id ?>" class="btn btn-primary">upraviť
-                        default</a></td>
-                <td colspan="2"><a href="password_change.php?id=<?= $worker->id ?>" class="btn btn-primary">
-                        zmeniť
-                        heslo</a></td>
-                <td colspan="6"><a href="month_view.php?id=<?= $worker->id ?>&m=<?= $year ?>-<?= $month ?>"
-                                   class="btn btn-primary">mesačný prehľad</a></td>
-            </tr>
+        <div class="container-fluid">
+            <div class="row d-none d-xl-flex">
+                <div class="col-xl-1"><strong>Deň</strong></div>
+                <div class="col-xl-1"><strong>Začiatočný čas</strong></div>
+                <div class="col-xl-1"><strong>Konečný čas</strong></div>
+                <div class="col-xl-1"><strong>Začiatok pauzy</strong></div>
+                <div class="col-xl-1"><strong>Koniec pauzy</strong></div>
+                <div class="col-xl-1"><strong>Celkový čas</strong></div>
+                <div class="col-xl-2"><strong>Náplň práce</strong></div>
+                <div class="col-xl-2"><strong>Projekt</strong></div>
+                <div class="col-xl-1"><strong>Vykonané</strong></div>
+                <div class="col-xl-1"><strong>Odoslať</strong></div>
+                <div class="col-xl-1"></div>
+            </div>
             <?php
             foreach ($days as $day) {
                 $closed = $service->WorkerHasDayClosed($worker->id, $day->day);
                 $workerData = $service->GetWorkerWorkDay($worker->id, $day);
                 $projectData = $service->GetProjectDataForWorkday($workerData->id);
                 ?>
-                <tr class="<?= "day_" . $day->day . " worker_" . $worker->id ?> table-row">
-                    <td><?= $list_of_days[date("D", strtotime($day->day))] . "<br>" . date("d.m.Y", strtotime($day->day)) ?></td>
-                    <form method="post" action="submit_workday.php"
-                          onsubmit="return verifyProjectInputs('projects_<?=$day->day?>',
-                                  'total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>',
-                                  'project_<?= $worker->id . "_" . $day->day_of_week ?>')">
+                <form method="post" action="submit_workday.php"
+                      onsubmit="return verifyProjectInputs('projects_<?= $day->day ?>',
+                              'total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>',
+                              'project_<?= $worker->id . "_" . $day->day_of_week ?>')">
+                    <div class="row <?= "day_" . $day->day . " worker_" . $worker->id ?> table-row-index">
+                        <div class="col-xl-1 col-12"><?= $list_of_days[date("D", strtotime($day->day))] . " " . date("d.m.Y", strtotime($day->day)) ?></div>
+
                         <input required type="hidden" name="work_day_id" value="<?= $day->day ?>">
                         <input required type="hidden" name="worker_id" value="<?= $worker->id ?>">
-                        <td><input required
+                        <div class="col-2 d-xl-none mb-xl-0 mb-1"><label for="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_begin_time"><strong>Začiatok:</strong></label></div>
+                        <div class="col-xl-1 col-4 mb-xl-0 mb-1"><input required
                                    id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_begin_time"
                                    onchange="recalculateHours('total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>')"
                                    type="time" step="300" name="begin_time"
-                                   value="<?= $workerData->begin_time ?>" <?=$closed?"disabled":""?>></td>
-                        <td><input required id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_end_time"
+                                   value="<?= $workerData->begin_time ?>" <?= $closed ? "disabled" : "" ?>></div>
+                        <div class="col-2 d-xl-none mb-xl-0 mb-1"><label for="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_end_time"><strong>Koniec:</strong></label></div>
+                        <div class="col-xl-1 col-4 mb-xl-0 mb-1"><input required id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_end_time"
                                    onchange="recalculateHours('total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>')"
                                    type="time" step="300" name="end_time"
-                                   value="<?= $workerData->end_time ?>" <?=$closed?"disabled":""?>>
-                        </td>
-                        <td><input
+                                   value="<?= $workerData->end_time ?>" <?= $closed ? "disabled" : "" ?>>
+                        </div>
+                        <div class="col-2 d-xl-none mb-xl-0 mb-1"><label for="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_break_begin"><strong>Pauza:</strong></label></div>
+                        <div class="col-xl-1 col-4 mb-xl-0 mb-1"><input
                                     id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_break_begin"
                                     onchange="recalculateHours('total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>')"
                                     type="time" step="300" name="break_begin"
-                                    value="<?= $workerData->break_begin ?>" <?=$closed?"disabled":""?>></td>
-                        <td><input
+                                    value="<?= $workerData->break_begin ?>" <?= $closed ? "disabled" : "" ?>></div>
+                        <div class="col-2 d-xl-none mb-xl-0 mb-1"><label for="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_break_end"><strong>do:</strong></label></div>
+                        <div class="col-xl-1 col-4 mb-xl-0 mb-1"><input
                                     id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_break_end"
                                     onchange="recalculateHours('total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>')"
                                     type="time" step="300" name="break_end"
-                                    value="<?= $workerData->break_end ?>" <?=$closed?"disabled":""?>></td>
-                        <td id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>">00:00</td>
-                        <td><textarea required name="description" <?=$closed?"disabled":""?>><?= $workerData->description ?></textarea>
-                        </td>
-                        <td>
+                                    value="<?= $workerData->break_end ?>" <?= $closed ? "disabled" : "" ?>></div>
+                        <div class="col-6 d-xl-none mb-xl-0 mb-1"><strong>Čas celkom:</strong></div>
+                        <div class="col-xl-1 col-6 mb-xl-0 mb-1" id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>" style="color: green; font-weight: bold">00:00</div>
+                        <div class="col-12 d-xl-none"><label for="textarea<?= $worker->id . "_" . $day->day_of_week ?>"><strong>Popis práce:</strong></label></div>
+                        <div class="col-xl-2 col-12 mb-xl-0 mb-1"><textarea style="width: 100%; height: 100%" id="textarea<?= $worker->id . "_" . $day->day_of_week ?>" required
+                                      name="description" <?= $closed ? "disabled" : "" ?>><?= $workerData->description ?></textarea>
+                        </div>
+                        <div class="col-xl-2 col-12 d-none d-xl-block">
                             <a class="btn btn-primary" data-toggle="collapse"
                                href="#project_<?= $worker->id . "_" . $day->day_of_week ?>" role="button"
                                aria-expanded="false"
@@ -124,14 +154,15 @@ include "message_bar.php";
                                     <?php $projects = $service->GetRelevantProjectsForDay($workerData->id);
                                     foreach ($projects as $project) {
                                         ?>
-                                        <div class="row" style="padding: 5px;">
+                                        <div class="row">
                                             <div class="col-4">
                                                 <label for="project_<?= $worker->id . "_" . $day->day_of_week . "_" . $project->id ?>"><?= $project->name ?></label>
                                             </div>
                                             <div class="col-8">
-                                                <input step="300" type="time" class="projects_<?=$day->day?>" name="projects[<?= $project->id ?>]"
+                                                <input step="300" type="time" class="projects_<?= $day->day ?>"
+                                                       name="projects[<?= $project->id ?>]"
                                                        id="project_<?= $worker->id . "_" . $day->day_of_week . "_" . $project->id ?>"
-                                                       value="<?= $projectData[$project->id] ?? null ?>" <?=$closed?"disabled":""?>>
+                                                       value="<?= $projectData[$project->id] ?? null ?>" <?= $closed ? "disabled" : "" ?>>
                                             </div>
                                         </div>
                                         <?php
@@ -139,24 +170,44 @@ include "message_bar.php";
                                     ?>
                                 </div>
                             </div>
-                        </td>
-                        <td><input type="checkbox"
+                        </div>
+                        <div class="col-12 d-xl-none"><strong>Projekty:</strong></div>
+                        <div class="d-xl-none container-fluid">
+                            <?php foreach ($projects as $project) {
+                            ?>
+                            <div class="row mb-1">
+                                <div class="col-6">
+                                    <label for="project_<?= $worker->id . "_" . $day->day_of_week . "_" . $project->id ?>"><?= $project->name ?></label>
+                                </div>
+                                <div class="col-6">
+                                    <input step="300" type="time" class="projects_<?= $day->day ?>"
+                                           name="projects[<?= $project->id ?>]"
+                                           id="project_<?= $worker->id . "_" . $day->day_of_week . "_" . $project->id ?>"
+                                           value="<?= $projectData[$project->id] ?? null ?>" <?= $closed ? "disabled" : "" ?>>
+                                </div>
+                            </div>
+                            <?php
+                            }
+                            ?>
+                        </div>
+                        <div class="col-3 d-xl-none mb-xl-0 mb-1"><label for="done_<?= $worker->id . "_" . $day->day_of_week ?>"><strong>Vykonané:</strong></label></div>
+                        <div class="col-xl-1 col-3"><input type="checkbox" id="done_<?= $worker->id . "_" . $day->day_of_week ?>"
                                    name="done" <?php if (date("Y-m-d") < $day->day || $closed) echo "disabled" ?> <?php if ($workerData->done) echo "checked" ?>>
-                        </td>
-                        <td id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>"><?php if(!$closed){?><input required
-                                                                                               type="submit"
-                                                                                               class="btn btn-primary"
-                                                                                               value="Uložiť" "><?php }?>
-                        </td>
+                        </div>
+                        <div class="col-xl-1 col-6" id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>"><?php if (!$closed) { ?><input
+                                    required
+                                    type="submit"
+                                    class="btn btn-primary"
+                                    value="Uložiť" "><?php } ?>
+                        </div>
                         <script>
                             document.getElementById("total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>").addEventListener("load", recalculateHours("total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>"))
                         </script>
-                    </form>
-                </tr>
+                    </div>
+                </form>
                 <?php
             }
             ?>
-            </tbody>
-        </table>
+        </div>
     </div>
 </div>
