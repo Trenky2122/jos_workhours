@@ -106,6 +106,9 @@ include "message_bar.php";
                 <form method="post" action="submit_workday.php"
                       onsubmit="return verifyProjectInputs('projects_<?= $day->day ?>',
                               'total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>',
+                              'project_<?= $worker->id . "_" . $day->day_of_week ?>') ||
+                              verifyProjectInputs('projects_m_<?= $day->day ?>',
+                              'total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>',
                               'project_<?= $worker->id . "_" . $day->day_of_week ?>')">
                     <div class="row <?= "day_" . $day->day . " worker_" . $worker->id ?> table-row-index">
                         <div class="col-xxl-1 col-12"><?= $list_of_days[date("D", strtotime($day->day))] . " " . date("d.m.Y", strtotime($day->day)) ?></div>
@@ -177,12 +180,12 @@ include "message_bar.php";
                             ?>
                             <div class="row mb-1">
                                 <div class="col-6">
-                                    <label for="project_<?= $worker->id . "_" . $day->day_of_week . "_" . $project->id ?>"><?= $project->name ?></label>
+                                    <label for="project_m_<?= $worker->id . "_" . $day->day_of_week . "_" . $project->id ?>"><?= $project->name ?></label>
                                 </div>
                                 <div class="col-6">
-                                    <input step="300" type="time" class="projects_<?= $day->day ?>"
-                                           name="projects[<?= $project->id ?>]"
-                                           id="project_<?= $worker->id . "_" . $day->day_of_week . "_" . $project->id ?>"
+                                    <input step="300" type="time" class="projects_m_<?= $day->day ?>"
+                                           name="projects_m[<?= $project->id ?>]"
+                                           id="project_m_<?= $worker->id . "_" . $day->day_of_week . "_" . $project->id ?>"
                                            value="<?= $projectData[$project->id] ?? null ?>" <?= $closed ? "disabled" : "" ?>>
                                 </div>
                             </div>
@@ -194,10 +197,18 @@ include "message_bar.php";
                         <div class="col-xxl-1 col-6"><input type="checkbox" id="done_<?= $worker->id . "_" . $day->day_of_week ?>"
                                    name="done" <?php if (date("Y-m-d") < $day->day || $closed) echo "disabled" ?> <?php if ($workerData->done) echo "checked" ?>>
                         </div>
-                        <div class="col-xxl-1 col-6" id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>"><?php if (!$closed) { ?><input
+                        <div class="d-xxl-none col-6" id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>"><?php if (!$closed) { ?><input
                                     required
                                     type="submit"
                                     class="btn btn-primary"
+                                    name="submit_m"
+                                    value="Uložiť" "><?php } ?>
+                        </div>
+                        <div class="d-none col-1 d-xxl-block" id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>"><?php if (!$closed) { ?><input
+                                    required
+                                    type="submit"
+                                    class="btn btn-primary"
+                                    name="submit"
                                     value="Uložiť" "><?php } ?>
                         </div>
                         <script>
