@@ -37,12 +37,12 @@ $worker = $service->GetWorkerWithId($_SESSION["user_id"]);
 $list_of_days = ["Mon" => "Pondelok", "Tue" => "Utorok", "Wed" => "Streda", "Thu" => "Štvrtok", "Fri" => "Piatok", "Sat" => "Sobota", "Sun" => "Nedeľa"];
 include "message_bar.php";
 ?>
-<div class="row mt-1 d-none d-xl-flex">
+<div class="row mt-1 d-none d-xxl-flex">
     <div class="col-6">
         <form method="get" action="index.php">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-xl-6 col-10 col-lg-8">
+                    <div class="col-xxl-6 col-10 col-xxl-8">
                         <label for="week">Týždeň</label>
                         <input type="week" id="week" name="w">
                     </div>
@@ -54,7 +54,7 @@ include "message_bar.php";
         </form>
     </div>
 </div>
-<div class="row mt-1 d-xl-none">
+<div class="row mt-1 d-xxl-none">
     <div class="col-12">
         <form method="get" action="index.php">
             <div class="container-fluid">
@@ -84,18 +84,18 @@ include "message_bar.php";
 <div class="row">
     <div class="col" style="overflow-x: auto">
         <div class="container-fluid">
-            <div class="row d-none d-xl-flex">
-                <div class="col-xl-1"><strong>Deň</strong></div>
-                <div class="col-xl-1"><strong>Začiatočný čas</strong></div>
-                <div class="col-xl-1"><strong>Konečný čas</strong></div>
-                <div class="col-xl-1"><strong>Začiatok pauzy</strong></div>
-                <div class="col-xl-1"><strong>Koniec pauzy</strong></div>
-                <div class="col-xl-1"><strong>Celkový čas</strong></div>
-                <div class="col-xl-2"><strong>Náplň práce</strong></div>
-                <div class="col-xl-2"><strong>Projekt</strong></div>
-                <div class="col-xl-1"><strong>Vykonané</strong></div>
-                <div class="col-xl-1"><strong>Odoslať</strong></div>
-                <div class="col-xl-1"></div>
+            <div class="row d-none d-xxl-flex">
+                <div class="col-xxl-1"><strong>Deň</strong></div>
+                <div class="col-xxl-1"><strong>Začiatočný čas</strong></div>
+                <div class="col-xxl-1"><strong>Konečný čas</strong></div>
+                <div class="col-xxl-1"><strong>Začiatok pauzy</strong></div>
+                <div class="col-xxl-1"><strong>Koniec pauzy</strong></div>
+                <div class="col-xxl-1"><strong>Celkový čas</strong></div>
+                <div class="col-xxl-2"><strong>Náplň práce</strong></div>
+                <div class="col-xxl-2"><strong>Projekt</strong></div>
+                <div class="col-xxl-1"><strong>Vykonané</strong></div>
+                <div class="col-xxl-1"><strong>Odoslať</strong></div>
+                <div class="col-xxl-1"></div>
             </div>
             <?php
             foreach ($days as $day) {
@@ -108,41 +108,41 @@ include "message_bar.php";
                               'total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>',
                               'project_<?= $worker->id . "_" . $day->day_of_week ?>')">
                     <div class="row <?= "day_" . $day->day . " worker_" . $worker->id ?> table-row-index">
-                        <div class="col-xl-1 col-12"><?= $list_of_days[date("D", strtotime($day->day))] . " " . date("d.m.Y", strtotime($day->day)) ?></div>
+                        <div class="col-xxl-1 col-12"><?= $list_of_days[date("D", strtotime($day->day))] . " " . date("d.m.Y", strtotime($day->day)) ?></div>
 
                         <input required type="hidden" name="work_day_id" value="<?= $day->day ?>">
                         <input required type="hidden" name="worker_id" value="<?= $worker->id ?>">
-                        <div class="col-2 d-xl-none mb-xl-0 mb-1"><label for="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_begin_time"><strong>Začiatok:</strong></label></div>
-                        <div class="col-xl-1 col-4 mb-xl-0 mb-1"><input required
+                        <div class="col-6 d-xxl-none mb-xxl-0 mb-1"><label for="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_begin_time"><strong>Začiatok:</strong></label></div>
+                        <div class="col-xxl-1 col-6 mb-xxl-0 mb-1"><input required
                                    id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_begin_time"
                                    onchange="recalculateHours('total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>')"
                                    type="time" step="300" name="begin_time"
                                    value="<?= $workerData->begin_time ?>" <?= $closed ? "disabled" : "" ?>></div>
-                        <div class="col-2 d-xl-none mb-xl-0 mb-1"><label for="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_end_time"><strong>Koniec:</strong></label></div>
-                        <div class="col-xl-1 col-4 mb-xl-0 mb-1"><input required id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_end_time"
+                        <div class="col-6 d-xxl-none mb-xxl-0 mb-1"><label for="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_end_time"><strong>Koniec:</strong></label></div>
+                        <div class="col-xxl-1 col-6 mb-xxl-0 mb-1"><input required id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_end_time"
                                    onchange="recalculateHours('total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>')"
                                    type="time" step="300" name="end_time"
                                    value="<?= $workerData->end_time ?>" <?= $closed ? "disabled" : "" ?>>
                         </div>
-                        <div class="col-2 d-xl-none mb-xl-0 mb-1"><label for="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_break_begin"><strong>Pauza:</strong></label></div>
-                        <div class="col-xl-1 col-4 mb-xl-0 mb-1"><input
+                        <div class="col-6 d-xxl-none mb-xxl-0 mb-1"><label for="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_break_begin"><strong>Pauza:</strong></label></div>
+                        <div class="col-xxl-1 col-6 mb-xxl-0 mb-1"><input
                                     id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_break_begin"
                                     onchange="recalculateHours('total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>')"
                                     type="time" step="300" name="break_begin"
                                     value="<?= $workerData->break_begin ?>" <?= $closed ? "disabled" : "" ?>></div>
-                        <div class="col-2 d-xl-none mb-xl-0 mb-1"><label for="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_break_end"><strong>do:</strong></label></div>
-                        <div class="col-xl-1 col-4 mb-xl-0 mb-1"><input
+                        <div class="col-6 d-xxl-none mb-xxl-0 mb-1"><label for="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_break_end"><strong>do:</strong></label></div>
+                        <div class="col-xxl-1 col-6 mb-xxl-0 mb-1"><input
                                     id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>_break_end"
                                     onchange="recalculateHours('total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>')"
                                     type="time" step="300" name="break_end"
                                     value="<?= $workerData->break_end ?>" <?= $closed ? "disabled" : "" ?>></div>
-                        <div class="col-6 d-xl-none mb-xl-0 mb-1"><strong>Čas celkom:</strong></div>
-                        <div class="col-xl-1 col-6 mb-xl-0 mb-1" id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>" style="color: green; font-weight: bold">00:00</div>
-                        <div class="col-12 d-xl-none"><label for="textarea<?= $worker->id . "_" . $day->day_of_week ?>"><strong>Popis práce:</strong></label></div>
-                        <div class="col-xl-2 col-12 mb-xl-0 mb-1"><textarea style="width: 100%; height: 100%" id="textarea<?= $worker->id . "_" . $day->day_of_week ?>" required
+                        <div class="col-6 d-xxl-none mb-xxl-0 mb-1"><strong>Čas celkom:</strong></div>
+                        <div class="col-xxl-1 col-6 mb-xxl-0 mb-1" id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>" style="color: green; font-weight: bold">00:00</div>
+                        <div class="col-12 d-xxl-none"><label for="textarea<?= $worker->id . "_" . $day->day_of_week ?>"><strong>Popis práce:</strong></label></div>
+                        <div class="col-xxl-2 col-12 mb-xxl-0 mb-1"><textarea style="width: 100%; height: 100%" id="textarea<?= $worker->id . "_" . $day->day_of_week ?>" required
                                       name="description" <?= $closed ? "disabled" : "" ?>><?= $workerData->description ?></textarea>
                         </div>
-                        <div class="col-xl-2 col-12 d-none d-xl-block">
+                        <div class="col-xxl-2 col-12 d-none d-xxl-block">
                             <a class="btn btn-primary" data-toggle="collapse"
                                href="#project_<?= $worker->id . "_" . $day->day_of_week ?>" role="button"
                                aria-expanded="false"
@@ -171,8 +171,8 @@ include "message_bar.php";
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 d-xl-none"><strong>Projekty:</strong></div>
-                        <div class="d-xl-none container-fluid">
+                        <div class="col-12 d-xxl-none"><strong>Projekty:</strong></div>
+                        <div class="d-xxl-none container-fluid">
                             <?php foreach ($projects as $project) {
                             ?>
                             <div class="row mb-1">
@@ -190,11 +190,11 @@ include "message_bar.php";
                             }
                             ?>
                         </div>
-                        <div class="col-3 d-xl-none mb-xl-0 mb-1"><label for="done_<?= $worker->id . "_" . $day->day_of_week ?>"><strong>Vykonané:</strong></label></div>
-                        <div class="col-xl-1 col-3"><input type="checkbox" id="done_<?= $worker->id . "_" . $day->day_of_week ?>"
+                        <div class="col-6 d-xxl-none mb-xxl-0 mb-1"><label for="done_<?= $worker->id . "_" . $day->day_of_week ?>"><strong>Vykonané:</strong></label></div>
+                        <div class="col-xxl-1 col-6"><input type="checkbox" id="done_<?= $worker->id . "_" . $day->day_of_week ?>"
                                    name="done" <?php if (date("Y-m-d") < $day->day || $closed) echo "disabled" ?> <?php if ($workerData->done) echo "checked" ?>>
                         </div>
-                        <div class="col-xl-1 col-6" id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>"><?php if (!$closed) { ?><input
+                        <div class="col-xxl-1 col-6" id="total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>"><?php if (!$closed) { ?><input
                                     required
                                     type="submit"
                                     class="btn btn-primary"
