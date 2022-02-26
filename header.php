@@ -9,6 +9,7 @@
 <head>
     <meta charset="utf-8">
     <title>JOS Group - pracovný čas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="logo2.png" />
     <link rel="stylesheet" href="export_tables.css">
     <link rel="stylesheet" href="styles.css">

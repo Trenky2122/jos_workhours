@@ -55,7 +55,9 @@ function reloadFilter() {
     [].forEach.call(elsToShow, (el) => el.style.display = "table-row");
 }
 
-function verifyProjectInputs(classnameProjects, valueId, collapse){
+function verifyProjectInputs(classnameProjects, valueId, collapse, done){
+    if(!document.getElementById(done).checked)
+        return true;
     let allProjectTimes = document.getElementsByClassName(classnameProjects);
     let originalTime = document.getElementById(valueId).innerHTML;
     [].forEach.call(allProjectTimes, (element) => {
