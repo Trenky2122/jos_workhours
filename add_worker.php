@@ -1,14 +1,9 @@
 <?php
+$active = "settings";
 include "header.php";
 include "message_bar.php";
 ?>
 <div style="padding-left: 1em">
-    <div class="row">
-        <div class="col-1" style="margin-top: 1.5em">
-            <a href="admin.php" class="btn btn-primary"> Späť</a>
-        </div>
-    </div>
-
     <div class="row" style="padding-top: 1.5em;">
         <form method="post" action="submit_worker.php">
             <div class="row mb-1">

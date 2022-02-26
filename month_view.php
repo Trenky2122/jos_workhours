@@ -1,13 +1,20 @@
 <?php
+$active = "month";
 include "header.php";
 include_once "service.php";
 
 $service = new Service();
-$worker_id = $_GET["id"];
+$worker_id = $_SESSION["user_id"];
+if(isset($_GET["id"])){
+    $worker_id = $_GET["id"];
+}
 $worker_name = $service->GetWorkerNameWithId($worker_id);
-$year = substr($_GET["m"], 0, 4);
-$month = substr($_GET["m"], 5, 2);
-
+$year = date("Y");
+$month = date("m");
+if(isset($_GET["m"])){
+    $year = substr($_GET["m"], 0, 4);
+    $month = substr($_GET["m"], 5, 2);
+}
 $list_of_dates = array();
 $list_of_days = ["Mon" => "po", "Tue" => "ut", "Wed" => "st", "Thu" => "št", "Fri" => "pi", "Sat" => "so", "Sun" => "ne"];
 $start_date = "01-" . $month . "-" . $year;
@@ -29,7 +36,7 @@ include "message_bar.php";
             <form method="get" action="month_view.php">
                 <input type="hidden" name="id" value="<?= $worker_id ?>">
                 <label for="month" class="mb-1">mesiac/rok:</label>
-                <input type="month" class="mb-1" id="month" name="m" value="<?= $_GET["m"] ?>">
+                <input type="month" class="mb-1" id="month" name="m" value="<?=$year."-".$month?>">
                 <input type="submit" name="submit" value="Hľadať">
             </form>
         </div>
@@ -132,16 +139,16 @@ include "message_bar.php";
             <button class="btn btn-primary" id="pdf" onclick="window.print()">Export</button>
         </div>
         <div class="col-1">
-            <a class="btn btn-primary" href="month_view_80.php?id=<?= $worker_id ?>&m=<?= $_GET["m"] ?>">80 hodinová
+            <a class="btn btn-primary" href="month_view_80.php?id=<?= $worker_id ?>&m=<?= $year."-".$month ?>">80 hodinová
                 verzia</a>
         </div>
         <?php
         $rework = false;
-        if (!($closed = $service->WorkerHasMonthClosed($worker_id, $_GET["m"])) && !($rework = $service->WorkerHasMonthForRework($worker_id, $_GET["m"])) && ($_SESSION["user_id"] == $worker_id || $_SESSION["user_role"] == 1)) { ?>
+        if (!($closed = $service->WorkerHasMonthClosed($worker_id, $year."-".$month)) && !($rework = $service->WorkerHasMonthForRework($worker_id, $year."-".$month)) && ($_SESSION["user_id"] == $worker_id || $_SESSION["user_role"] == 1)) { ?>
             <div class="col-4">
                 <form action="submit_close_month.php" method="post">
                     <input type="hidden" value="<?= $worker_id ?>" name="worker_id">
-                    <input type="hidden" value="<?= $_GET["m"] ?>" name="month">
+                    <input type="hidden" value="<?= $year."-".$month ?>" name="month">
                     <input class="btn btn-primary" name="submit" value="Uzavrieť mesiac" type="submit">
                 </form>
             </div>
@@ -158,7 +165,7 @@ include "message_bar.php";
                     <form action="submit_rework_month.php" method="post">
                         <div class="container-fluid">
                             <input type="hidden" value="<?= $worker_id ?>" name="worker_id">
-                            <input type="hidden" value="<?= $_GET["m"] ?>" name="month">
+                            <input type="hidden" value="<?= $year."-".$month ?>" name="month">
                             <div class="row">
                                 <div class="col-6">
                                     <label for="explanation" style="float: right">Zdôvodnenie:</label>
@@ -183,7 +190,7 @@ include "message_bar.php";
             <div class="col-2">
                 <form action="submit_close_month_correction.php" method="post">
                     <input type="hidden" value="<?= $worker_id ?>" name="worker_id">
-                    <input type="hidden" value="<?= $_GET["m"] ?>" name="month">
+                    <input type="hidden" value="<?= $year."-".$month ?>" name="month">
                     <input class="btn btn-primary" name="submit" value="Uzavrieť mesiac (oprava)" type="submit">
                 </form>
             </div>

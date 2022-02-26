@@ -1,4 +1,5 @@
 <?php
+$active = "week";
 include "header.php";
 include_once "service.php";
 $service = new Service();

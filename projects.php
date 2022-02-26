@@ -1,4 +1,5 @@
 <?php
+$active = "projects";
 include "header.php";
 include "message_bar.php";
 include_once "service.php";

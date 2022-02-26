@@ -1,4 +1,5 @@
 <?php
+$active = "settings";
 include "header.php";
 include_once "service.php";
 include "message_bar.php";

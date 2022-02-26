@@ -1,7 +1,7 @@
 <?php
 
 define("BYPASS_AUYHENTICATE", 1);
-
+$active = "";
 include "header.php";
 include "message_bar.php";
 ?>

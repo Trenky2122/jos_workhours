@@ -2,6 +2,10 @@
     if(!defined("BYPASS_AUYHENTICATE") || !BYPASS_AUYHENTICATE) {
         include "authenticate.php";
     }
+    $menu_active = "";
+    if(isset($active)){
+        $menu_active = $active;
+    }
 ?>
 
 <!DOCTYPE html>
@@ -24,28 +28,44 @@
 </head>
 <body>
 <script src="scripts.js" type="application/javascript"></script>
-<div class="container-fluid">
-    <div class="row" style="background-color: #0132B9; color: #FFFFFF;">
-        <div class="col-2">
+<nav class="navbar navbar-expand-xl navbar-dark" style="background-color: #0132B9">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="index.php">
             <img src="logo2.png" alt="logo" height="50">
-        </div>
-        <div class="col-7">
-            <a href="index.php" class="headline" style="color: #FFFFFF; text-decoration: none;">
-                <h1>JOS Group - pracovný čas</h1>
-            </a>
-        </div>
-        <div class="col-3">
-            <div class="row">
-                <div class="col">
-                    <a href="admin.php" class="noprint" style="color: #FFFFFF; float: right;  text-decoration: none;">Ďalšie akcie</a>
-                </div>
-                <div class="col noprint">
-                    <form method="post" action="logout.php" style="float: right;">
-                        <input type="submit" name="submit" value="Odhlásiť sa" style="background: transparent; color: #FFFFFF; border: none;">
-                    </form>
-                </div>
-            </div>
+            JOS Group - pracovný čas
+        </a>
+        <button class="navbar-toggler noprint" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse noprint" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link <?php if($menu_active == "month") echo "active"?>" href="month_view.php">Mesačný prehľad</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <?php if($menu_active == "week") echo "active"?>" href="overview.php">Týždenný prehľad</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <?php if($menu_active == "projects") echo "active"?>" href="projects.php">Prehľad projektov</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle <?php if($menu_active == "settings") echo "active"?>" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Nastavenia
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <li><a class="dropdown-item" href="password_change.php?id=<?= $_SESSION["user_id"] ?>">Zmeniť heslo</a></li>
+                        <li><a class="dropdown-item" href="default_change.php?id=<?= $_SESSION["user_id"] ?>">Zmeniť default hodnoty</a></li>
+                        <?php if($_SESSION["user_role"]==1){?><li><a class="dropdown-item" href="add_worker.php">Pridať používateľa</a></li><?php }?>
+                        <?php if($_SESSION["user_role"]==1){?><li><a class="dropdown-item" href="add_project.php">Pridať projekt</a></li><?php }?>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="logout.php">Odhlásiť</a>
+                </li>
+            </ul>
         </div>
     </div>
+</nav>
+<div class="container-fluid">
 
 

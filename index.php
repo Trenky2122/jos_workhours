@@ -1,4 +1,5 @@
 <?php
+$active = "";
 include "header.php";
 include_once "service.php";
 
@@ -59,11 +60,13 @@ include "message_bar.php";
         <form method="get" action="index.php">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-10">
+                    <div class="col-12">
                         <label for="day">Týždeň (ľubovoľný deň z neho):</label>
+                    </div>
+                    <div class="col-12">
                         <input type="date" id="day" name="d">
                     </div>
-                    <div class="col-2">
+                    <div class="col-12">
                         <input type="submit" name="submit" value="Hľadať" class="float-start">
                     </div>
                 </div>
@@ -73,13 +76,6 @@ include "message_bar.php";
 </div>
 <div class="row worker_<?= $worker->id ?> worker_name mb-1">
     <h1><strong><?= $worker->GetFullName() ?></strong></h1>
-    <div class="col-4"><a href="default_change.php?id=<?= $worker->id ?>" class="btn btn-primary">Upraviť
-            default</a></div>
-    <div class="col-4"><a href="password_change.php?id=<?= $worker->id ?>" class="btn btn-primary">
-            Zmeniť
-            heslo</a></div>
-    <div class="col-4"><a href="month_view.php?id=<?= $worker->id ?>&m=<?= $year ?>-<?= $month ?>"
-                             class="btn btn-primary">Mesačný prehľad</a></div>
 </div>
 <div class="row">
     <div class="col" style="overflow-x: auto">
