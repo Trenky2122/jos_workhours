@@ -60,6 +60,9 @@
                     </ul>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="https://webmail.webhouse.sk/" target="_blank">Mail</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="logout.php">Odhlásiť</a>
                 </li>
             </ul>
