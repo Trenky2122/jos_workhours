@@ -34,6 +34,16 @@ class Service
         return $retval;
     }
 
+    public function GetAllWorkersId(): array
+    {
+        $result = $this->mysqli->query("SELECT id FROM workers ORDER BY surname, name");
+        $retval = array();
+        while ($row = $result->fetch_assoc()) {
+            $retval[] = $row['id'];
+        }
+        return $retval;
+    }
+
     public function GetDaysInWeek($year, $week): array
     {
         $retval = array();
@@ -186,6 +196,15 @@ class Service
         $stmt->execute();
         $result = $stmt->get_result()->fetch_assoc();
         return $result['name'] . ' ' . $result['surname'];
+    }
+
+    public function GetWorkerNameWithId2($worker_id): string
+    {
+        $stmt = $this->mysqli->prepare("SELECT name, surname FROM workers WHERE id=?");
+        $stmt->bind_param("i", $worker_id);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        return $result['surname'] . ' ' . $result['name'];
     }
 
     public function CreateOrUpdateDefaultForUser($worker_id, $workday_number, $begin_time, $end_time, $break_begin,

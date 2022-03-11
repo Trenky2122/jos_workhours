@@ -3,6 +3,9 @@ $active = "month";
 include "header.php";
 include_once "service.php";
 
+if($_SESSION["user_role"] == 1)
+    header("Location: admin_month_view.php");;
+
 $service = new Service();
 $worker_id = $_SESSION["user_id"];
 if(isset($_GET["id"])){
@@ -29,9 +32,6 @@ include "message_bar.php";
 ?>
 
     <div class="row noprint mb-1" style="margin-top: 1em">
-        <div class="col-1">
-            <a href="index.php" class="btn btn-primary"> späť</a>
-        </div>
         <div class="col-3">
             <form method="get" action="month_view.php">
                 <input type="hidden" name="id" value="<?= $worker_id ?>">
@@ -134,6 +134,7 @@ include "message_bar.php";
             </table>
         </div>
     </div>
+
     <div class="row noprint mt-1 mb-1">
         <div class="col-1">
             <button class="btn btn-primary" id="pdf" onclick="window.print()">Export</button>

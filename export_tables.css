@@ -37,7 +37,7 @@
 
 @media print {
     .export_table_cell {
-        padding: 1px;
+        padding: 0.01em;
     }
 
     .export_table {
