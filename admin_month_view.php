@@ -37,7 +37,10 @@ $all_workers_id = $service->GetAllWorkersId();
 include "message_bar.php";
 
 foreach ($all_workers_id as $wrk_id){
-    echo "<div><a href='admin_month_view.php?wrk=$wrk_id'>" . $service->GetWorkerNameWithId2($wrk_id) . "</a></div>";
+    if(!($closed = $service->WorkerHasMonthClosed($wrk_id, $year."-".$month)) && !($rework = $service->WorkerHasMonthForRework($wrk_id, $year."-".$month)))
+        echo "<div><a href='admin_month_view.php?wrk=$wrk_id' style='color: red'>" . $service->GetWorkerNameWithId2($wrk_id) . "</a></div>";
+    else
+        echo "<div><a href='admin_month_view.php?wrk=$wrk_id'>" . $service->GetWorkerNameWithId2($wrk_id) . "</a></div>";
 }
 
 if(!in_array($selected_worker_id, $all_workers_id))
@@ -49,8 +52,9 @@ $total_time = array();
 
 <div class="row noprint mb-1" style="margin-top: 1em">
     <div class="col-3">
-        <form method="get" action="month_view.php">
-            <input type="hidden" name="id" value="<?= $selected_worker_id ?>">
+        <form method="get" action="admin_month_view.php">
+            <input type="hidden" name="id" value="<?= $worker_id ?>">
+            <input type="hidden" name="wrk" value="<?= $selected_worker_id ?>">
             <label for="month" class="mb-1">mesiac/rok:</label>
             <input type="month" class="mb-1" id="month" name="m" value="<?=$year."-".$month?>">
             <input type="submit" name="submit" value="Hľadať">
@@ -160,7 +164,7 @@ $total_time = array();
     </div>
     <?php
     $rework = false;
-    if (!($closed = $service->WorkerHasMonthClosed($worker_id, $year."-".$month)) && !($rework = $service->WorkerHasMonthForRework($worker_id, $year."-".$month)) && ($_SESSION["user_id"] == $worker_id || $_SESSION["user_role"] == 1)) { ?>
+    if (!($closed = $service->WorkerHasMonthClosed($selected_worker_id, $year."-".$month)) && !($rework = $service->WorkerHasMonthForRework($selected_worker_id, $year."-".$month)) && ($_SESSION["user_id"] == $worker_id || $_SESSION["user_role"] == 1)) { ?>
         <div class="col-4">
             <form action="submit_close_month.php" method="post">
                 <input type="hidden" value="<?= $selected_worker_id ?>" name="worker_id">
