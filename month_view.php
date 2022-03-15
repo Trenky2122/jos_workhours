@@ -3,7 +3,7 @@ $active = "month";
 include "header.php";
 include_once "service.php";
 
-if($_SESSION["user_role"] == 1)
+if($_SESSION["user_id"] == 1)
     header("Location: admin_month_view.php");;
 
 $service = new Service();
