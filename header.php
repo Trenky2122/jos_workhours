@@ -40,7 +40,7 @@
         <div class="collapse navbar-collapse noprint" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link <?php if($menu_active == "month") echo "active"?>" href="month_view.php">Mesačný prehľad</a>
+                    <a class="nav-link <?php if($menu_active == "month") echo "active"?>" href="<?php if($_SESSION["user_id"]==1)echo "admin_";?>month_view.php">Mesačný prehľad</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link <?php if($menu_active == "week") echo "active"?>" href="overview.php">Týždenný prehľad</a>
