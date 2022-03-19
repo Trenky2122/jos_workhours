@@ -363,8 +363,12 @@ class Service
 
     public function CreateOrEditProjectDataForWorkday($project_id, $worker_workday_id, $time): bool
     {
-        if($this->TimeIs0($time))
+        if($this->TimeIs0($time)){
+            $stmt = $this->mysqli->prepare("DELETE FROM workday_project WHERE project_id=? AND worker_workday_id=?");
+            $stmt->bind_param("ii", $project_id, $worker_workday_id);
+            $stmt->execute();
             return true;
+        }
         $stmt = $this->mysqli->prepare("SELECT * FROM workday_project WHERE project_id=? AND worker_workday_id=?");
         $stmt->bind_param("ii", $project_id, $worker_workday_id);
         $stmt->execute();
