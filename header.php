@@ -57,6 +57,7 @@
                         <li><a class="dropdown-item" href="default_change.php?id=<?= $_SESSION["user_id"] ?>">Zmeniť default hodnoty</a></li>
                         <?php if($_SESSION["user_role"]==1){?><li><a class="dropdown-item" href="add_worker.php">Pridať používateľa</a></li><?php }?>
                         <?php if($_SESSION["user_role"]==1){?><li><a class="dropdown-item" href="add_project.php">Pridať projekt</a></li><?php }?>
+                        <?php if($_SESSION["user_role"]==1){?><li><a class="dropdown-item" href="admin_month_view.php">Admin mesiace</a></li><?php }?>
                     </ul>
                 </li>
                 <li class="nav-item">

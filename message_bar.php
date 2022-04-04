@@ -93,4 +93,13 @@ if(isset($_GET["succ"])){
         </div>
         <?php
     }
+    if($_GET["succ"]==7){
+        ?>
+        <div class="row">
+            <div class="alert alert-success" role="alert">
+                Upozornenie odoslané.
+            </div>
+        </div>
+        <?php
+    }
 }

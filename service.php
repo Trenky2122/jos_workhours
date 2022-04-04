@@ -26,7 +26,7 @@ class Service
     public function GetAllWorkers(): array
     {
         $result = $this->mysqli->query("SELECT name, surname, id, password_hash, member_since, is_admin, email FROM
-                                                                     workers");
+                                                                     workers WHERE id<>1 ");
         $retval = array();
         while ($row = $result->fetch_object("Worker")) {
             $retval[] = $row;
@@ -36,7 +36,7 @@ class Service
 
     public function GetAllWorkersId(): array
     {
-        $result = $this->mysqli->query("SELECT id FROM workers ORDER BY surname, name");
+        $result = $this->mysqli->query("SELECT id FROM workers WHERE id<>1 ORDER BY surname, name");
         $retval = array();
         while ($row = $result->fetch_assoc()) {
             $retval[] = $row['id'];

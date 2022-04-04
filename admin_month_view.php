@@ -36,6 +36,14 @@ $all_workers_id = $service->GetAllWorkersId();
 
 include "message_bar.php";
 ?>
+<div class="row mt-1">
+    <div class="col">
+        <form action="submit_close_month_reminder.php" method="post">
+            <input type="hidden" name="month" value="<?=$year."-".$month?>">
+            <input type="submit" name="submit" class="btn btn-primary" value="Poslať upozornenie na uzáver hodín.">
+        </form>
+    </div>
+</div>
 <table class="table table-striped">
     <thead>
     <tr>

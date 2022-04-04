@@ -92,4 +92,42 @@ class Mailer
             return "Message could not be sent. Mailer Error: {$this->mail->ErrorInfo}";
         }
     }
+
+    public function SendCloseMonthReminder($month){
+        $workers = $this->service->GetAllWorkers();
+        try {
+            foreach ($workers as $worker) {
+                $this->mail->isSMTP();
+                $this->mail->CharSet = "UTF-8";
+                $this->mail->Host = 'mail.hostmaster.sk';                     //Set the SMTP server to send through
+                $this->mail->SMTPAuth = true;                                   //Enable SMTP authentication
+                $this->mail->Username = 'noreply@josgroup.sk';                     //SMTP username
+                $this->mail->Password = '000000';                               //SMTP password
+                $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
+                $this->mail->Port = 465;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+
+                //Recipients
+                $worker_full_name = $worker->GetFullName();
+                $this->mail->setFrom('noreply@josgroup.sk', "Ján Osadský");
+                $this->mail->addAddress($worker->email, $worker_full_name);
+                $this->mail->addReplyTo("osadsky.jan@josgroup.sk", "Ján Osadský");
+
+                //Content
+                $this->mail->isHTML(true);                                  //Set email format to HTML
+                $this->mail->Subject = "Pripomienka na uzáver hodín.";
+                $this->mail->Body = "<p>Pripomínam, že skončil mesiac a treba uzavrieť hodiny.</p>
+                                    <p>Hodiny nájdete <a href='https://josgroup.sk/hodiny/month_view.php?id=$worker->id&m=$month'>
+                                    tu</a>.</p>";
+                $this->mail->AltBody = "Hodiny používateľa $worker_full_name za mesiac $month boli uzavreté.";
+
+                $this->mail->send();
+                $this->mail->smtpClose();
+                $this->mail->clearAllRecipients();;
+                $this->mail->clearReplyTos();
+            }
+            return "Ok";
+        } catch (Exception $e) {
+            return "Message could not be sent. Mailer Error: {$this->mail->ErrorInfo}";
+        }
+    }
 }

@@ -134,10 +134,10 @@ include "message_bar.php";
     </div>
 
     <div class="row noprint mt-1 mb-1">
-        <div class="col-1">
+        <div class="col-xxl-1 col-4">
             <button class="btn btn-primary" id="pdf" onclick="window.print()">Export</button>
         </div>
-        <div class="col-1">
+        <div class="col-xxl-1 col-4">
             <a class="btn btn-primary" href="month_view_80.php?id=<?= $worker_id ?>&m=<?= $year."-".$month ?>">80 hodinová
                 verzia</a>
         </div>
