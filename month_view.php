@@ -26,6 +26,27 @@ for ($i = $start_time; $i < $end_time; $i += 86400) {
 }
 $done_days = $service->GetDoneWorkerWorkDays($worker_id, $month, $year);
 $total_time = array();
+$sum_unitl_now = "00:00";
+$overflow=false;
+$set_overflow=false;
+$max_sum = null;
+if(isset($_GET["limit"])){
+    $time_split = explode(":", $_GET["limit"]);
+    if(count($time_split)== 2){
+        if(is_numeric($time_split[0])&&is_numeric($time_split[1])){
+            for($i=count(str_split($time_split[0])); $i<3; $i++){
+                $time_split[0]="0".$time_split[0];
+            }
+            $max_sum=$time_split[0].":".$time_split[1];
+        }
+    }
+}
+function normalizeTime($time): string
+{
+    $timeSplit = explode(":", $time);
+    $hours = intval($timeSplit[0]);
+    return $hours.":".$timeSplit[1];
+}
 include "message_bar.php";
 ?>
 
@@ -68,6 +89,8 @@ include "message_bar.php";
                 <tbody>
                 <?php
                 foreach ($list_of_dates as $date_day) {
+                    if($set_overflow)
+                        $overflow=true;
                     $date = $date_day[0];
                     $day = $list_of_days[$date_day[1]];
                     $date2 = date('Y-m-d', strtotime($date));
@@ -87,64 +110,71 @@ include "message_bar.php";
                         $class = 'sun';
                     else
                         $class = 'ord';
+                    if(!$overflow) {
+                        $day_time = $service->CalculateDayTime($row['begin_time'], $row['end_time'], $row['break_begin'], $row['break_end']);
+                        $sum_unitl_now = $service->CalculateTotalTime(array($day_time, $sum_unitl_now));
+                        if ($max_sum != null && $sum_unitl_now >= $max_sum) {
+                            $day_time = $service->GetReducedTimeToMaximum($day_time, $sum_unitl_now, $max_sum);
+                            $sum_unitl_now = $max_sum;
+                            $set_overflow = true;
+                            $row["break_begin"] = null;
+                            $row["break_end"] = null;
+                            $row["end_time"] = "16:00:00";
+                            $row["begin_time"] = $service->CalculateDayTime($day_time.":00", "16:00:00", null, null);
+                        }
+                        $total_time[] = $day_time;
+                    }
                     echo("<tr><td class='export_table_cell " . $class . "'>" . $date . "</td>");
                     echo("<td class='export_table_cell " . $class . "'>" . $day . "</td>");
-                    echo("<td class='export_table_cell " . $class . "'>" . substr($row['begin_time'], 0, 5) . "</td>");
-                    echo("<td class='export_table_cell " . $class . "'>" . substr($row['end_time'], 0, 5) . "</td>");
+                    echo("<td class='export_table_cell " . $class . "'>" . ($overflow ? "" :substr($row['begin_time'], 0, 5) ). "</td>");
+                    echo("<td class='export_table_cell " . $class . "'>" . ($overflow ? "" :substr($row['end_time'], 0, 5)) . "</td>");
                     $pause = $service->CalculateDayTime($row["break_begin"], $row["break_end"], null, null);
-                    echo("<td class='export_table_cell " . $class . "'>" . $pause . "</td>");
-                    $day_time = $service->CalculateDayTime($row['begin_time'], $row['end_time'], $row['break_begin'], $row['break_end']);
-                    $total_time[] = $day_time;
-                    echo("<td class='export_table_cell " . $class . " total'>" . $day_time . "</td>");
-                    echo("<td class='export_table_cell " . $class . "'>" . $row['description'] . "</td>");
-                    echo("<td class='export_table_cell " . $class . " last'>" . ($row["id"] == -1 ? "" : $service->GetProjectsStringForWorkersWorkday($row["id"])) . "</td>");
+                    echo("<td class='export_table_cell " . $class . "'>" . ($overflow ? "" :$pause) . "</td>");
+
+                    echo("<td class='export_table_cell " . $class . " total'>" . ($overflow ? "" :$day_time) . "</td>");
+                    echo("<td class='export_table_cell " . $class . "'>" . ($overflow ? "" :$row['description']) . "</td>");
+                    echo("<td class='export_table_cell " . $class . " last'>" . ($overflow ? "" :($row["id"] == -1 ? "" : $service->GetProjectsStringForWorkersWorkday($row["id"]))) . "</td>");
                     echo("</tr>");
                 }
                 ?>
                 <tr>
                     <td colspan="5" class="sum export_table_cell"><strong>Suma:</strong></td>
-                    <td class="sum export_table_cell"><strong><?= $service->CalculateTotalTime($total_time) ?></strong>
-                    </td>
+                    <td class="sum export_table_cell"><strong><?= normalizeTime($service->CalculateTotalTime($total_time)) ?></strong></td>
                     <td class="sum export_table_cell" colspan="2">
                         <?php
-                        $projectData = $service->GetProjectDataForWorker($worker_id, $list_of_dates[0][2], end($list_of_dates)[2]);
-                        foreach ($projectData as $key => $value) {
-                            echo "<strong>" . $key . "</strong>: " . $value . "&emsp;&emsp;&emsp;&emsp;";
+                        if(!$overflow) {
+                            $projectData = $service->GetProjectDataForWorker($worker_id, $list_of_dates[0][2], end($list_of_dates)[2]);
+                            foreach ($projectData as $key => $value) {
+                                echo "<strong>" . $key . "</strong>: " . normalizeTime($value) . "&emsp;&emsp;&emsp;&emsp;";
+                            }
                         }
-                        ?></td>
+                        ?>
+                    </td>
                 </tr>
                 <tr>
-                    <td colspan="3" class="export_table_cell bot-three"
-                        style='border-right: none;border-top: none;border-bottom: none;'>
+                    <td colspan="3" class="export_table_cell bot-three" style='border-right: none;border-top: none;border-bottom: none;'>
                         Dátum: <?= $list_of_dates[count($list_of_dates) - 1][0] ?></td>
                     <td colspan="3" class="export_table_cell" style='border: none;'>Podpis zamestnanca</td>
-                    <td colspan="2" class="export_table_cell last"
-                        style='border-left: none;border-top: none;border-bottom: none'>Pečiatka a podpis
+                    <td colspan="2" class="export_table_cell last" style='border-left: none;border-top: none;border-bottom: none'>Pečiatka a podpis
                         zamestnávateľa
                     </td>
                 </tr>
                 <tr>
-                    <td colspan="8" class="export_table_cell last sun bot-three"
-                        style="border-top: none; padding: 20px;border-right: 2px solid black;">
+                    <td colspan="8" class="export_table_cell last sun bot-three" style="border-top: none; padding: 20px;border-right: 2px solid black;">
                     </td>
                 </tr>
                 </tbody>
             </table>
         </div>
     </div>
-
     <div class="row noprint mt-1 mb-1">
-        <div class="col-xxl-1 col-4">
+        <div class="col-12">
             <button class="btn btn-primary" id="pdf" onclick="window.print()">Export</button>
-        </div>
-        <div class="col-xxl-1 col-4">
-            <a class="btn btn-primary" href="month_view_80.php?id=<?= $worker_id ?>&m=<?= $year."-".$month ?>">80 hodinová
-                verzia</a>
         </div>
         <?php
         $rework = false;
         if (!($closed = $service->WorkerHasMonthClosed($worker_id, $year."-".$month)) && !($rework = $service->WorkerHasMonthForRework($worker_id, $year."-".$month)) && ($_SESSION["user_id"] == $worker_id || $_SESSION["user_role"] == 1)) { ?>
-            <div class="col-4">
+            <div class="col-12 mt-1">
                 <form action="submit_close_month.php" method="post">
                     <input type="hidden" value="<?= $worker_id ?>" name="worker_id">
                     <input type="hidden" value="<?= $year."-".$month ?>" name="month">
@@ -152,7 +182,7 @@ include "message_bar.php";
                 </form>
             </div>
         <?php } else if ($closed) { ?>
-            <div class="col-3">
+            <div class="col-12 mt-1" style="max-width: 400px">
                 <div class="alert alert-info" role="alert">
                     Mesiac bol uzavretý.
                 </div>
@@ -160,7 +190,7 @@ include "message_bar.php";
             <?php
             if ($_SESSION["user_role"] == 1) {
                 ?>
-                <div class="col-4">
+                <div class="col-12 mt-1" style="max-width: 400px">
                     <form action="submit_rework_month.php" method="post">
                         <div class="container-fluid">
                             <input type="hidden" value="<?= $worker_id ?>" name="worker_id">
@@ -186,7 +216,7 @@ include "message_bar.php";
         }
         if ($rework) {
             ?>
-            <div class="col-2">
+            <div class="col-12 mt-1">
                 <form action="submit_close_month_correction.php" method="post">
                     <input type="hidden" value="<?= $worker_id ?>" name="worker_id">
                     <input type="hidden" value="<?= $year."-".$month ?>" name="month">
@@ -196,6 +226,18 @@ include "message_bar.php";
             <?php
         }
         ?>
+        <div class="row noprint mt-1">
+            <div class="col-12">
+                <form method="get">
+                    <input type="hidden" value="<?=$worker_id?>" name="id">
+                    <input type="hidden" value="<?=$year.'-'.$month?>" name="m">
+                    <label for="limit">Limit (h:mm)</label>
+                    <input type="text" name="limit" id="limit" />
+                    <input type="submit" class="btn btn-primary" value="Nastaviť limit na maximálny počet hodín" />
+                </form>
+            </div>
+        </div>
     </div>
+
 <?php
 include "footer.php";

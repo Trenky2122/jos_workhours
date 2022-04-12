@@ -297,13 +297,13 @@ class Service
         }
         $min = $total % 60;
         $hrs = floor($total / 60);
-        return ($hrs<10?"0":"")."$hrs:".($min<10?"0":"")."$min";
+        return ($hrs<10?"00":($hrs<100?"0":""))."$hrs:".($min<10?"0":"")."$min";
     }
 
-    public function GetReducedTimeTo80($original_time, $overflow_time):string{
+    public function GetReducedTimeToMaximum($original_time, $overflow_time, $max_time):string{
         $minutes_orig = $this->GetMinutesFromHHMM($original_time);
         $minutes_overflow = $this->GetMinutesFromHHMM($overflow_time);
-        $minutes_wanted = $this->GetMinutesFromHHMM("80:00");
+        $minutes_wanted = $this->GetMinutesFromHHMM($max_time);
         $result_minutes = $minutes_orig-($minutes_overflow - $minutes_wanted);
         $h = floor($result_minutes/60);
         $m = $result_minutes % 60;
