@@ -99,7 +99,7 @@ include "message_bar.php";
                 $workerData = $service->GetWorkerWorkDay($worker->id, $day);
                 $projectData = $service->GetProjectDataForWorkday($workerData->id);
                 ?>
-                <form method="post" action="submit_workday.php"
+                <form method="post" action="submit_workday.php" onkeydown="return event.key != 'Enter';"
                       onsubmit="return verifyProjectInputs('projects_<?= $day->day ?>',
                               'total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>',
                               'project_<?= $worker->id . "_" . $day->day_of_week ?>',
