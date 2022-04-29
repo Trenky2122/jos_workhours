@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '42bc39b0ab7394e39b10750321253fdbb8e169cf',
+        'reference' => '52a85eeb89410f88db75e4c42b10815e3b2dc696',
         'name' => '__root__',
         'dev' => true,
     ),
@@ -16,7 +16,18 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '42bc39b0ab7394e39b10750321253fdbb8e169cf',
+            'reference' => '52a85eeb89410f88db75e4c42b10815e3b2dc696',
+            'dev_requirement' => false,
+        ),
+        'moismailzai/clockify' => array(
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../moismailzai/clockify',
+            'aliases' => array(
+                0 => '9999999-dev',
+            ),
+            'reference' => '300eb89d2e2d387d643ec497faf64156899431a1',
             'dev_requirement' => false,
         ),
         'phpmailer/phpmailer' => array(

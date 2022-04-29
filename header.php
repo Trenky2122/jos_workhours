@@ -55,6 +55,7 @@
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                         <li><a class="dropdown-item" href="password_change.php?id=<?= $_SESSION["user_id"] ?>">Zmeniť heslo</a></li>
                         <li><a class="dropdown-item" href="default_change.php?id=<?= $_SESSION["user_id"] ?>">Zmeniť default hodnoty</a></li>
+                        <li><a class="dropdown-item" href="api_key.php">Pridať clockify API</a></li>
                         <?php if($_SESSION["user_role"]==1){?><li><a class="dropdown-item" href="add_worker.php">Pridať používateľa</a></li><?php }?>
                         <?php if($_SESSION["user_role"]==1){?><li><a class="dropdown-item" href="add_project.php">Pridať projekt</a></li><?php }?>
                         <?php if($_SESSION["user_role"]==1){?><li><a class="dropdown-item" href="admin_month_view.php">Admin mesiace</a></li><?php }?>

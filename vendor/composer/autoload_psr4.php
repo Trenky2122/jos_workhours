@@ -7,4 +7,5 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'PHPMailer\\PHPMailer\\' => array($vendorDir . '/phpmailer/phpmailer/src'),
+    'MoIsmailzai\\' => array($vendorDir . '/moismailzai/clockify/src'),
 );

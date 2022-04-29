@@ -171,6 +171,13 @@ include "message_bar.php";
         <div class="col-12">
             <button class="btn btn-primary" id="pdf" onclick="window.print()">Export</button>
         </div>
+        <div class="col-12 mt-1">
+            <form action="load_clokify.php" method="post">
+                <input type="hidden" value="<?= $worker_id ?>" name="worker_id">
+                <input type="hidden" value="<?= serialize($list_of_dates) ?>" name="dates">
+                <input class="btn btn-primary" name="submit" value="Načítať clockify" type="submit">
+            </form>
+        </div>
         <?php
         $rework = false;
         if (!($closed = $service->WorkerHasMonthClosed($worker_id, $year."-".$month)) && !($rework = $service->WorkerHasMonthForRework($worker_id, $year."-".$month)) && ($_SESSION["user_id"] == $worker_id || $_SESSION["user_role"] == 1)) { ?>

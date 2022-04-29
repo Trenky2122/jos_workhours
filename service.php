@@ -658,4 +658,30 @@ class Service
         $stmt->execute();
         return $stmt->errno;
     }
+
+    public function SetApiKey($worker_id, $workspace, $key){
+        $sql = "SELECT * FROM api_keys WHERE worker_id = $worker_id";
+        $result = $this->mysqli->query($sql);
+        if($result->num_rows == 0){
+            $sql = "INSERT INTO api_keys(worker_id, workspace, key) VALUES (?, ?, ?)";
+            $stmt = $this->mysqli->prepare($sql);
+            $stmt->bind_param("iss", $worker_id, $workspace, $key);
+            $stmt->execute();
+            return $stmt->errno;
+        }
+        $sql = "UPDATE api_keys SET name=?, key=? WHERE worker_id=?)";
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("ssi", $name, $key, $worker_id);
+        $stmt->execute();
+        return $stmt->errno;
+    }
+
+    public function GetApiKey($worker_id){
+        $sql = "SELECT * FROM api_keys WHERE worker_id = ?";
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("i", $worker_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_assoc();
+    }
 }

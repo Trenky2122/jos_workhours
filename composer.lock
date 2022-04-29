@@ -4,8 +4,54 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "90bbf95869b4e88bf0dc5022e708a458",
+    "content-hash": "11050c22686662e6cc1555190f279242",
     "packages": [
+        {
+            "name": "moismailzai/clockify",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/moismailzai/clockify.git",
+                "reference": "300eb89d2e2d387d643ec497faf64156899431a1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/moismailzai/clockify/zipball/300eb89d2e2d387d643ec497faf64156899431a1",
+                "reference": "300eb89d2e2d387d643ec497faf64156899431a1",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.0"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "MoIsmailzai\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mo Ismailzai",
+                    "email": "moismailzai@gmail.com",
+                    "homepage": "https://www.ismailzai.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Rough PHP bindings for the Clockify API. The main reason I built this is because none of Clockify's built-in reports allow time entries with duplicate titles to be aggregated.",
+            "keywords": [
+                "clockify"
+            ],
+            "support": {
+                "issues": "https://github.com/moismailzai/clockify/issues",
+                "source": "https://github.com/moismailzai/clockify/tree/master"
+            },
+            "time": "2021-01-07T02:33:09+00:00"
+        },
         {
             "name": "phpmailer/phpmailer",
             "version": "v6.5.3",
@@ -88,7 +134,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "moismailzai/clockify": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
