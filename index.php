@@ -12,7 +12,6 @@ $service = new Service();
 $year = date("Y");
 $month = date("m");
 $week = date("W");
-
 if (isset($_GET['w'])) {
     $arr = explode("-W", $_GET['w']);
     if (!isset($arr[1]) || !isset($arr[0])) {
@@ -32,7 +31,9 @@ elseif (isset($_GET['d'])){
     $month = date("m", strtotime($_GET['d']));
     $week = date("W", strtotime($_GET['d']));
 }
-
+$lastweek_week = date("W", strtotime("+".($week-1)." week", strtotime("1.1.".$year)));
+$lastweek_year = date("Y", strtotime("+".($week-1)." week", strtotime("1.1.".$year)));
+$lastweek_date = date("Y-m-d", strtotime("+".($week-1)." week", strtotime("1.1.".$year)));
 $days = $service->GetDaysInWeek($year, $week);
 $worker = $service->GetWorkerWithId($_SESSION["user_id"]);
 $list_of_days = ["Mon" => "Pondelok", "Tue" => "Utorok", "Wed" => "Streda", "Thu" => "Štvrtok", "Fri" => "Piatok", "Sat" => "Sobota", "Sun" => "Nedeľa"];
@@ -45,7 +46,7 @@ include "message_bar.php";
                 <div class="row">
                     <div class="col-xxl-6 col-10 col-xxl-8">
                         <label for="week">Týždeň</label>
-                        <input type="week" id="week" name="w">
+                        <input type="week" id="week" name="w" value="<?=$lastweek_year."-W".$lastweek_week?>">
                     </div>
                     <div class="col-2">
                         <input type="submit" name="submit" value="Hľadať">
@@ -64,7 +65,7 @@ include "message_bar.php";
                         <label for="day">Týždeň (ľubovoľný deň z neho):</label>
                     </div>
                     <div class="col-12">
-                        <input type="date" id="day" name="d">
+                        <input type="date" id="day" name="d" value="<?=$lastweek_date?>">
                     </div>
                     <div class="col-12">
                         <input type="submit" name="submit" value="Hľadať" class="float-start">
