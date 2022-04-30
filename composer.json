@@ -1,6 +1,9 @@
 {
     "require": {
         "phpmailer/phpmailer": "^6.5",
-        "moismailzai/clockify": "dev-master"
-    }
+        "jdecool/clockify-api": "*",
+        "guzzlehttp/guzzle": "7.4.x-dev",
+        "http-interop/http-factory-guzzle": "dev-master"
+    },
+    "minimum-stability": "dev"
 }

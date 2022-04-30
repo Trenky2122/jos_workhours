@@ -1,26 +1,20 @@
 <?php
 require_once './vendor/autoload.php';
-use MoIsmailzai\Clockify;
+include_once "service.php";
 
-if(!isset($_POST['worker_id']) || !isset($_POST['dates'])){
-    header("Location: index.php?err=1");
-    die();
-}
 $service = new Service();
-$apiKeyWorkspace = $service->GetApiKey($_POST['worker_id']);
-try {
-    $clockify = new Clockify($apiKeyWorkspace['key'], $apiKeyWorkspace['workspace']);
-} catch (Exception $e) {
-    header("Location: index.php?err=1");
-    die();
-}
-$dates = unserialize($_POST['dates']);
+$apiKeyWorkspace = $service->GetWorkerWithId($_POST["worker_id"])->clockify_api_key;
 
-$result = "";
+$builder = new JDecool\Clockify\ClientBuilder();
+$client = $builder->createClientV1($apiKeyWorkspace);
 
-foreach ( $dates as $date ) {
-    $report = $clockify->getReportByDay( $date );
-    $result .= $clockify->formatReport( $report );
-}
+$apiFactory = new JDecool\Clockify\ApiFactory($client);
+$userApi = $apiFactory->userApi();
 
-print_r( $result );
+$user = $userApi->current();
+$time_entries = $apiFactory->timeEntryApi();
+$params = array();
+
+echo json_encode($user);
+$entries = $client->get("workspaces/".$user->activeWorkspace()."/user/".$user->id()."/time-entries");
+echo json_encode($entries);

@@ -8,6 +8,7 @@ class Worker{
     public bool $is_admin;
     public string $password_hash;
     public string $username;
+    public string $clockify_api_key;
     public function GetFullName(): string{
         return $this->name." ".$this->surname;
     }

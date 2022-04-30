@@ -25,8 +25,8 @@ class Service
      */
     public function GetAllWorkers(): array
     {
-        $result = $this->mysqli->query("SELECT name, surname, id, password_hash, member_since, is_admin, email FROM
-                                                                     workers WHERE id<>1 ");
+        $result = $this->mysqli->query("SELECT name, surname, id, password_hash, member_since, is_admin, email,
+       clockify_api_key FROM workers WHERE id<>1 ");
         $retval = array();
         while ($row = $result->fetch_object("Worker")) {
             $retval[] = $row;
