@@ -3,6 +3,13 @@ $active = "settings";
 include "header.php";
 include "message_bar.php";
 ?>
+<script>
+    function updateMail(){
+        document.getElementById("email").value = document.getElementById("surname").value.toLowerCase().normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "") +
+            "." + document.getElementById("name").value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+</script>
 <div style="padding-left: 1em">
     <div class="row" style="padding-top: 1.5em;">
         <form method="post" action="submit_worker.php">
@@ -11,7 +18,7 @@ include "message_bar.php";
                     <label for="name">Meno:</label>
                 </div>
                 <div class="col-6">
-                    <input type="text" name="name" id="name">
+                    <input type="text" name="name" id="name" onchange="updateMail();">
                 </div>
             </div>
             <div class="row mb-1">
@@ -19,7 +26,7 @@ include "message_bar.php";
                     <label for="surname">Priezvisko:</label>
                 </div>
                 <div class="col-6">
-                    <input type="text" name="surname" id="surname">
+                    <input type="text" name="surname" id="surname" onchange="updateMail();">
                 </div>
             </div>
             <div class="row mb-1">
@@ -36,6 +43,14 @@ include "message_bar.php";
                 </div>
                 <div class="col-6">
                     <input type="date" name="since" id="since" value="<?=date("Y-m-d")?>">
+                </div>
+            </div>
+            <div class="row mb-1">
+                <div class="col-3">
+                    <label for="email">Členom od:</label>
+                </div>
+                <div class="col-6">
+                    <input type="text" name="email" id="email">@josgroup.sk
                 </div>
             </div>
             <div class="row mb-1">
