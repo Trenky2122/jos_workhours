@@ -582,7 +582,8 @@ class Service
      * @param $id
      * @return Worker
      */
-    public function GetWorkerWithId($id){
+    public function GetWorkerWithId($id): Worker
+    {
         $sql = "SELECT * FROM workers WHERE id=?";
         $stmt = $this->mysqli->prepare($sql);
         $stmt->bind_param("i", $id);
@@ -651,7 +652,8 @@ class Service
         return $stmt->errno;
     }
 
-    public function MarkWorkerMonthAsReworked($worker_id, $month){
+    public function MarkWorkerMonthAsReworked($worker_id, $month): int
+    {
         $sql = "UPDATE closed_months SET to_be_reworked=0 WHERE worker_id=? AND month=?";
         $stmt = $this->mysqli->prepare($sql);
         $stmt->bind_param("is", $worker_id, $month);
@@ -659,29 +661,12 @@ class Service
         return $stmt->errno;
     }
 
-    public function SetApiKey($worker_id, $workspace, $key){
-        $sql = "SELECT * FROM api_keys WHERE worker_id = $worker_id";
-        $result = $this->mysqli->query($sql);
-        if($result->num_rows == 0){
-            $sql = "INSERT INTO api_keys(worker_id, workspace, key) VALUES (?, ?, ?)";
-            $stmt = $this->mysqli->prepare($sql);
-            $stmt->bind_param("iss", $worker_id, $workspace, $key);
-            $stmt->execute();
-            return $stmt->errno;
-        }
-        $sql = "UPDATE api_keys SET name=?, key=? WHERE worker_id=?)";
+    public function SetApiKey($worker_id, $key): int
+    {
+        $sql = "UPDATE workers SET clockify_api_key=? WHERE id=?";
         $stmt = $this->mysqli->prepare($sql);
-        $stmt->bind_param("ssi", $name, $key, $worker_id);
+        $stmt->bind_param("si", $key, $worker_id);
         $stmt->execute();
         return $stmt->errno;
-    }
-
-    public function GetApiKey($worker_id){
-        $sql = "SELECT * FROM api_keys WHERE worker_id = ?";
-        $stmt = $this->mysqli->prepare($sql);
-        $stmt->bind_param("i", $worker_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        return $result->fetch_assoc();
     }
 }

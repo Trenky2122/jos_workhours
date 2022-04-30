@@ -18,14 +18,6 @@ $worker_id = $_SESSION["user_id"];
             </div>
         </div>
         <div class="row mt-1">
-            <div class="col">
-                <label style="float: right" for="workspace">Workspace:</label>
-            </div>
-            <div class="col">
-                <input type="text" name="workspace" id="workspace">
-            </div>
-        </div>
-        <div class="row mt-1">
             <div class="col"></div>
             <div class="col">
                 <input class="btn btn-primary" type="submit" value="Odoslať" name="submit">
