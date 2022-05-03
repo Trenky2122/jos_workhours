@@ -63,7 +63,7 @@ $worker_workdays = array();
 foreach ($entriesByDate as $date=>$entries){
     $worker_workday = new WorkerDayClockify();
     $worker_workday->worker_id = $_POST["worker_id"];
-    $work_day_date = $date;
+    $worker_workday->work_day_date = $date;
     usort($entries, "cmp");
     echo json_encode($entries, JSON_PRETTY_PRINT);
     $worker_workday->begin_time = date("H:i:s", strtotime($entries[0]["timeInterval"]["start"]));
@@ -77,9 +77,12 @@ foreach ($entriesByDate as $date=>$entries){
         $total_break_time = addIntervals($total_break_time, $difference);
     }
     $break_begin_time = new DateTime($entries[0]["timeInterval"]["end"]);
-    echo json_encode($total_break_time);
     $break_end_time = $break_begin_time->add($total_break_time);
     $worker_workday->break_end = $break_end_time->format("H:i:s");
+    if($worker_workday->break_begin == $worker_workday->break_end){
+        $worker_workday->break_begin = null;
+        $worker_workday->break_end = null;
+    }
     $worker_workdays[]=$worker_workday;
 }
 header('Content-type: application/json');
