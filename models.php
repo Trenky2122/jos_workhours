@@ -14,10 +14,16 @@ class Worker{
     }
 }
 
-class Week{
-    public string $db_id;
-    public string $monday;
+const PARTNERS_PROJECT_ID = 8;
 
+class WorkerDayClockify{
+    public string $begin_time;
+    public string $end_time;
+    public string $break_begin;
+    public string $break_end;
+    public string $work_day_date;
+    public string $description;
+    public int $worker_id;
 }
 
 class WorkDay{

@@ -174,7 +174,8 @@ include "message_bar.php";
         <div class="col-12 mt-1">
             <form action="load_clokify.php" method="post">
                 <input type="hidden" value="<?= $worker_id ?>" name="worker_id">
-                <input type="hidden" value="<?= serialize($list_of_dates) ?>" name="dates">
+                <input type="hidden" value="<?= date("Y-m-d\TH:i:s\Z", strtotime($start_date)) ?>" name="from">
+                <input type="hidden" value="<?= date("Y-m-d\TH:i:s\Z", strtotime($start_date ." +1 month")) ?>" name="to">
                 <input class="btn btn-primary" name="submit" value="Načítať clockify" type="submit">
             </form>
         </div>
