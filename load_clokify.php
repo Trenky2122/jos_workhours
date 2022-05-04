@@ -17,6 +17,26 @@ $time_entries = $apiFactory->timeEntryApi();
 $params = array();
 
 $entries = $client->get("workspaces/".$user->activeWorkspace()."/user/".$user->id()."/time-entries?start=".$_POST["from"]."&end=".$_POST["to"]);
+$days_in_db = $service->GetDoneWorkerWorkDays($_POST["worker_id"], date("m", strtotime($_POST["from"])), date("Y", strtotime($_POST["from"])));
+function dayFromDbToClockifyFormat($date, $start, $end, $description){
+    $day_in_clockify_format = array();
+    $day_in_clockify_format["timeInterval"] = array();
+    $dateTimeStart = new DateTime($date."T".$start);
+    $dateTimeEnd = new DateTime($date."T".$end);
+    $day_in_clockify_format["timeInterval"]["start"] = $dateTimeStart->format(DATE_ATOM);
+    $day_in_clockify_format["timeInterval"]["end"] = $dateTimeEnd->format(DATE_ATOM);
+    $day_in_clockify_format["description"] = $description;
+    return $day_in_clockify_format;
+}
+foreach($days_in_db as $date=>$day){
+    if($day["break_end"] == null){
+        $entries[] = dayFromDbToClockifyFormat($day["work_day_date"], $day["begin_time"], $day["end_time"], $day["description"]);
+    }
+    else{
+        $entries[] = dayFromDbToClockifyFormat($day["work_day_date"], $day["begin_time"], $day["break_begin"], $day["description"]);
+        $entries[] = dayFromDbToClockifyFormat($day["work_day_date"], $day["break_end"], $day["end_time"], "");
+    }
+}
 $entriesToAdd = array();
 for ($i=0; $i<count($entries); $i++){
     $startDate = new DateTime($entries[$i]["timeInterval"]["start"]);
@@ -25,6 +45,7 @@ for ($i=0; $i<count($entries); $i++){
     $endDate->setTimezone(new DateTimeZone("Europe/Bratislava"));
     $entries[$i]["timeInterval"]["start"] = $startDate->format(DATE_ATOM);
     $entries[$i]["timeInterval"]["end"] = $endDate->format(DATE_ATOM);
+    $entries[$i]["project"] = PARTNERS_PROJECT_ID;
     while(date("Y-m-d", strtotime($entries[$i]["timeInterval"]["start"])) < date("Y-m-d", strtotime($entries[$i]["timeInterval"]["end"]))){
         $newEntry = array();
         $newEntry["timeInterval"]=array();
@@ -44,7 +65,8 @@ $entriesByDate = array();
 foreach ($entries as $entry){
     $entriesByDate[date("Y-m-d", strtotime($entry["timeInterval"]["start"]))][]=$entry;
 }
-function cmp($a, $b)
+
+function cmp($a, $b): int
 {
     if ($a["timeInterval"]["start"] == $b["timeInterval"]["start"]) {
         return 0;
@@ -52,7 +74,8 @@ function cmp($a, $b)
     return ($a["timeInterval"]["start"] < $b["timeInterval"]["start"]) ? -1 : 1;
 }
 
-function addIntervals($i1, $i2){
+function addIntervals($i1, $i2): DateInterval
+{
     $e = new DateTime('00:00');
     $f = clone $e;
     $e->add($i1);

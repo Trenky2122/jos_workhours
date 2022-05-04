@@ -24,6 +24,7 @@ class WorkerDayClockify{
     public string $work_day_date;
     public string $description;
     public int $worker_id;
+    public array $projects;
 }
 
 class WorkDay{

@@ -669,4 +669,14 @@ class Service
         $stmt->execute();
         return $stmt->errno;
     }
+
+    public function OverwrtieClockifyDays($days){
+        $this->mysqli->autocommit(false);
+        $stmt1 = $this->mysqli->prepare("DELETE FROM worker_workdays WHERE work_day_date=?");
+        foreach ($days as $day){
+            $stmt1->bind_param("s", $day["work_day_date"]);
+            $stmt1->execute();
+        }
+        $this->mysqli->autocommit(true);
+    }
 }
