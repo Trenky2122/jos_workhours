@@ -18,7 +18,7 @@ $params = array();
 
 $entries = $client->get("workspaces/".$user->activeWorkspace()."/user/".$user->id()."/time-entries?start=".$_POST["from"]."&end=".$_POST["to"]);
 $days_in_db = $service->GetDoneWorkerWorkDays($_POST["worker_id"], date("m", strtotime($_POST["from"])), date("Y", strtotime($_POST["from"])));
-function dayFromDbToClockifyFormat($date, $start, $end, $description){
+function dayFromDbToClockifyFormat($date, $start, $end, $description, $projects){
     $day_in_clockify_format = array();
     $day_in_clockify_format["timeInterval"] = array();
     $dateTimeStart = new DateTime($date."T".$start);
@@ -26,16 +26,8 @@ function dayFromDbToClockifyFormat($date, $start, $end, $description){
     $day_in_clockify_format["timeInterval"]["start"] = $dateTimeStart->format(DATE_ATOM);
     $day_in_clockify_format["timeInterval"]["end"] = $dateTimeEnd->format(DATE_ATOM);
     $day_in_clockify_format["description"] = $description;
+    $day_in_clockify_format["projects"] = $projects;
     return $day_in_clockify_format;
-}
-foreach($days_in_db as $date=>$day){
-    if($day["break_end"] == null){
-        $entries[] = dayFromDbToClockifyFormat($day["work_day_date"], $day["begin_time"], $day["end_time"], $day["description"]);
-    }
-    else{
-        $entries[] = dayFromDbToClockifyFormat($day["work_day_date"], $day["begin_time"], $day["break_begin"], $day["description"]);
-        $entries[] = dayFromDbToClockifyFormat($day["work_day_date"], $day["break_end"], $day["end_time"], "");
-    }
 }
 $entriesToAdd = array();
 for ($i=0; $i<count($entries); $i++){
@@ -45,7 +37,6 @@ for ($i=0; $i<count($entries); $i++){
     $endDate->setTimezone(new DateTimeZone("Europe/Bratislava"));
     $entries[$i]["timeInterval"]["start"] = $startDate->format(DATE_ATOM);
     $entries[$i]["timeInterval"]["end"] = $endDate->format(DATE_ATOM);
-    $entries[$i]["project"] = PARTNERS_PROJECT_ID;
     while(date("Y-m-d", strtotime($entries[$i]["timeInterval"]["start"])) < date("Y-m-d", strtotime($entries[$i]["timeInterval"]["end"]))){
         $newEntry = array();
         $newEntry["timeInterval"]=array();
@@ -61,6 +52,21 @@ for ($i=0; $i<count($entries); $i++){
     }
 }
 array_push($entries, ...$entriesToAdd);
+
+for ($i=0; $i<count($entries); $i++){
+    $time = $service->CalculateDayTime($entries[$i]["timeInterval"]["start"], $entries[$i]["timeInterval"]["end"], null, null);
+    $entries[$i]["projects"] = array(PARTNERS_PROJECT_ID => $time);
+}
+
+foreach($days_in_db as $date=>$day){
+    if($day["break_end"] == null){
+        $entries[] = dayFromDbToClockifyFormat($day["work_day_date"], $day["begin_time"], $day["end_time"], $day["description"], $service->GetProjectDataForWorkday($day["id"]));
+    }
+    else{
+        $entries[] = dayFromDbToClockifyFormat($day["work_day_date"], $day["begin_time"], $day["break_begin"], $day["description"], $service->GetProjectDataForWorkday($day["id"]));
+        $entries[] = dayFromDbToClockifyFormat($day["work_day_date"], $day["break_end"], $day["end_time"], "", []);
+    }
+}
 $entriesByDate = array();
 foreach ($entries as $entry){
     $entriesByDate[date("Y-m-d", strtotime($entry["timeInterval"]["start"]))][]=$entry;
