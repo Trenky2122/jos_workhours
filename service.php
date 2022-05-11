@@ -483,6 +483,8 @@ class Service
     {
         $sql="SELECT p.name FROM projects p, workers_workday w, workday_project wp WHERE 
                 w.id=? AND p.id=wp.project_id AND wp.worker_workday_id = w.id";
+        if($worker_workday_id == -2)
+            return "Partners";
         $retval = "";
         $stmt = $this->mysqli->prepare($sql);
         $stmt->bind_param("i", $worker_workday_id);
@@ -670,13 +672,92 @@ class Service
         return $stmt->errno;
     }
 
-    public function OverwrtieClockifyDays($days){
-        $this->mysqli->autocommit(false);
-        $stmt1 = $this->mysqli->prepare("DELETE FROM worker_workdays WHERE work_day_date=?");
-        foreach ($days as $day){
-            $stmt1->bind_param("s", $day["work_day_date"]);
-            $stmt1->execute();
+    public function AddTimeIntervals($i1, $i2): DateInterval
+    {
+        $e = new DateTime('00:00');
+        $f = clone $e;
+        $e->add($i1);
+        $e->add($i2);
+        return $f->diff($e);
+    }
+
+    public function DayFromDbToClockifyFormat($date, $start, $end, $description): array
+    {
+        $day_in_clockify_format = array();
+        $day_in_clockify_format["timeInterval"] = array();
+        $dateTimeStart = new DateTime($date."T".$start);
+        $dateTimeEnd = new DateTime($date."T".$end);
+        $day_in_clockify_format["timeInterval"]["start"] = $dateTimeStart->format(DATE_ATOM);
+        $day_in_clockify_format["timeInterval"]["end"] = $dateTimeEnd->format(DATE_ATOM);
+        $day_in_clockify_format["description"] = $description;
+        return $day_in_clockify_format;
+    }
+
+    public function ClockifyEntriesToDayFormat($entries): array
+    {
+        $entriesToAdd = array();
+        for ($i=0; $i<count($entries); $i++){
+            $startDate = new DateTime($entries[$i]["timeInterval"]["start"]);
+            $startDate->setTimezone(new DateTimeZone("Europe/Bratislava"));
+            $endDate = new DateTime($entries[$i]["timeInterval"]["end"]);
+            $endDate->setTimezone(new DateTimeZone("Europe/Bratislava"));
+            $entries[$i]["timeInterval"]["start"] = $startDate->format(DATE_ATOM);
+            $entries[$i]["timeInterval"]["end"] = $endDate->format(DATE_ATOM);
+            while(date("Y-m-d", strtotime($entries[$i]["timeInterval"]["start"])) < date("Y-m-d", strtotime($entries[$i]["timeInterval"]["end"]))){
+                $newEntry = array();
+                $newEntry["timeInterval"]=array();
+                $newEntry["timeInterval"]["start"]=$entries[$i]["timeInterval"]["start"];
+                $date = new DateTime($entries[$i]["timeInterval"]["start"]);
+                $date->setTime(23, 59);
+                $newEntry["timeInterval"]["end"]=$date->format(DATE_ATOM);
+                $newEntry["description"]=$entries[$i]["description"];
+                $entriesToAdd[]=$newEntry;
+                $date -> add(new DateInterval("P1D"));
+                $date->setTime(0, 0);
+                $entries[$i]["timeInterval"]["start"] = $date->format(DATE_ATOM);
+            }
         }
-        $this->mysqli->autocommit(true);
+        array_push($entries, ...$entriesToAdd);
+        $entriesByDate = array();
+        foreach ($entries as $entry){
+            $entriesByDate[date("Y-m-d", strtotime($entry["timeInterval"]["start"]))][]=$entry;
+        }
+        function cmp($a, $b): int
+        {
+            if ($a["timeInterval"]["start"] == $b["timeInterval"]["start"]) {
+                return 0;
+            }
+            return ($a["timeInterval"]["start"] < $b["timeInterval"]["start"]) ? -1 : 1;
+        }
+        $worker_workdays = array();
+        foreach ($entriesByDate as $date=>$dayEntries){
+            $worker_workday = array();
+            $worker_workday["id"]=-2;
+            $worker_workday["work_day_date"] = $date;
+            $worker_workday["description"] = "";
+            foreach ($dayEntries as $dayEntry){
+                $worker_workday["description"] .= " ".$dayEntry["description"];
+            }
+            usort($dayEntries, "cmp");
+            $worker_workday["begin_time"] = date("H:i:s", strtotime($dayEntries[0]["timeInterval"]["start"]));
+            $worker_workday["end_time"] = date("H:i:s", strtotime($dayEntries[count($dayEntries)-1]["timeInterval"]["end"]));
+            $worker_workday["break_begin"] = date("H:i:s", strtotime($dayEntries[0]["timeInterval"]["end"]));
+            $total_break_time = new DateInterval("PT0H");
+            for($i=0; $i<count($dayEntries)-1; $i++){
+                $break_begin_time = new DateTime($dayEntries[$i]["timeInterval"]["end"]);
+                $break_end_time = new DateTime($dayEntries[$i+1]["timeInterval"]["start"]);
+                $difference = $break_begin_time->diff($break_end_time);
+                $total_break_time = $this->AddTimeIntervals($total_break_time, $difference);
+            }
+            $break_begin_time = new DateTime($dayEntries[0]["timeInterval"]["end"]);
+            $break_end_time = $break_begin_time->add($total_break_time);
+            $worker_workday["break_end"] = $break_end_time->format("H:i:s");
+            if($worker_workday["break_begin"] == $worker_workday["break_end"]){
+                $worker_workday["break_begin"] = null;
+                $worker_workday["break_end"] = null;
+            }
+            $worker_workdays[$date]=$worker_workday;
+        }
+        return $worker_workdays;
     }
 }

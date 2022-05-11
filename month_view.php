@@ -2,14 +2,15 @@
 $active = "month";
 include "header.php";
 include_once "service.php";
-
+require_once './vendor/autoload.php';
 
 $service = new Service();
 $worker_id = $_SESSION["user_id"];
 if(isset($_GET["id"])){
     $worker_id = $_GET["id"];
 }
-$worker_name = $service->GetWorkerNameWithId($worker_id);
+$worker = $service->GetWorkerWithId($worker_id);
+$worker_name = $worker->GetFullName();
 $year = date("Y");
 $month = date("m");
 if(isset($_GET["m"])){
@@ -25,6 +26,29 @@ for ($i = $start_time; $i < $end_time; $i += 86400) {
     $list_of_dates[] = array(date('d.m.Y', $i), date('D', $i), date("Y-m-d", $i));
 }
 $done_days = $service->GetDoneWorkerWorkDays($worker_id, $month, $year);
+if($worker->clockify_api_key != ""){
+    $builder = new JDecool\Clockify\ClientBuilder();
+    $client = $builder->createClientV1($worker->clockify_api_key);
+    $apiFactory = new JDecool\Clockify\ApiFactory($client);
+    $userApi = $apiFactory->userApi();
+
+    $user = $userApi->current();
+    $entries = $client->get("workspaces/".$user->activeWorkspace()
+        ."/user/".$user->id()."/time-entries?start=".date("Y-m-d\TH:i:s\Z", strtotime($start_date)).
+        "&end=".date("Y-m-d\TH:i:s\Z", strtotime($start_date ." +1 month")));
+
+    foreach($done_days as $date=>$day){
+        if($day["break_end"] == null){
+            $entries[] = $service->DayFromDbToClockifyFormat($day["work_day_date"], $day["begin_time"], $day["end_time"], $day["description"]);
+        }
+        else{
+            $entries[] = $service->DayFromDbToClockifyFormat($day["work_day_date"], $day["begin_time"], $day["break_begin"], $day["description"]);
+            $entries[] = $service->DayFromDbToClockifyFormat($day["work_day_date"], $day["break_end"], $day["end_time"], "");
+        }
+    }
+    $worker_workdays = $service->ClockifyEntriesToDayFormat($entries);
+    $done_days = $worker_workdays;
+}
 $total_time = array();
 $sum_unitl_now = "00:00";
 $overflow=false;
@@ -98,13 +122,12 @@ include "message_bar.php";
                     if (isset($done_days[$date2])) {
                         $row = $done_days[$date2];
                     } else {
-                        $row['id'] = -1;
-                        $row['begin_time'] = null;
-                        $row['end_time'] = null;
-                        $row['break_begin'] = null;
-                        $row['break_end'] = null;
-                        $row['project'] = null;
-                        $row['description'] = null;
+                        $row["id"] = -1;
+                        $row["begin_time"] = null;
+                        $row["end_time"] = null;
+                        $row["break_begin"] = null;
+                        $row["break_end"] = null;
+                        $row["description"] = null;
                     }
                     if ($day == 'nedeľa')
                         $class = 'sun';
@@ -170,14 +193,6 @@ include "message_bar.php";
     <div class="row noprint mt-1 mb-1">
         <div class="col-12">
             <button class="btn btn-primary" id="pdf" onclick="window.print()">Export</button>
-        </div>
-        <div class="col-12 mt-1">
-            <form action="load_clokify.php" method="post">
-                <input type="hidden" value="<?= $worker_id ?>" name="worker_id">
-                <input type="hidden" value="<?= date("Y-m-d\TH:i:s\Z", strtotime($start_date)) ?>" name="from">
-                <input type="hidden" value="<?= date("Y-m-d\TH:i:s\Z", strtotime($start_date ." +1 month")) ?>" name="to">
-                <input class="btn btn-primary" name="submit" value="Načítať clockify" type="submit">
-            </form>
         </div>
         <?php
         $rework = false;
