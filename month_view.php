@@ -30,7 +30,7 @@ for ($i = $start_time; $i < $end_time; $i += 86400) {
 $done_days = $service->GetDoneWorkerWorkDays($worker_id, $month, $year);
 $entries = array();
 if($closed_month_data && $closed_month_data["to_be_reworked"]==0){
-    $entries = json_decode($closed_month_data["clockify_data"]);
+    $entries = json_decode($closed_month_data["clockify_data"], true);
 }
 else{
     if($worker->clockify_api_key != "") {
@@ -214,7 +214,7 @@ include "message_bar.php";
                 <form action="submit_close_month.php" method="post">
                     <input type="hidden" value="<?= $worker_id ?>" name="worker_id">
                     <input type="hidden" value="<?= $year."-".$month ?>" name="month">
-                    <input type="hidden" value="<?= $clockify_data ?>" name="clockify_data">
+                    <input type="hidden" value='<?= $clockify_data ?>' name="clockify_data">
                     <input class="btn btn-primary" name="submit" value="Uzavrieť mesiac" type="submit">
                 </form>
             </div>
@@ -257,7 +257,7 @@ include "message_bar.php";
                 <form action="submit_close_month_correction.php" method="post">
                     <input type="hidden" value="<?= $worker_id ?>" name="worker_id">
                     <input type="hidden" value="<?= $year."-".$month ?>" name="month">
-                    <input type="hidden" value="<?= $clockify_data ?>" name="clockify_data">
+                    <input type="hidden" value='<?= $clockify_data ?>' name="clockify_data">
                     <input class="btn btn-primary" name="submit" value="Uzavrieť mesiac (oprava)" type="submit">
                 </form>
             </div>
