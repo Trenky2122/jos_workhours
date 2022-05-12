@@ -177,7 +177,7 @@ include "message_bar.php";
                     <td class="sum export_table_cell" colspan="2">
                         <?php
                         if(!$overflow) {
-                            $projectData = $service->GetProjectDataForWorker($worker_id, $list_of_dates[0][2], end($list_of_dates)[2]);
+                            $projectData = $service->GetProjectDataForWorker($worker_id, $list_of_dates[0][2], end($list_of_dates)[2], $clockify_data);
                             foreach ($projectData as $key => $value) {
                                 echo "<strong>" . $key . "</strong>: " . normalizeTime($value) . "&emsp;&emsp;&emsp;&emsp;";
                             }

@@ -599,7 +599,7 @@ class Service
         return $result->fetch_object("Worker");
     }
 
-    public function GetProjectDataForWorker($worker_id, $from, $to): array
+    public function GetProjectDataForWorker($worker_id, $from, $to, $clockify_data): array
     {
         $sql = "SELECT pj.name, time FROM projects pj, workers_workday w, workday_project wp WHERE wp.worker_workday_id = w.id AND wp.project_id=pj.id
                 AND w.worker_id=? AND w.work_day_date>=? AND w.work_day_date<=? AND w.done=1";
@@ -614,9 +614,23 @@ class Service
             }
             $values[$row["name"]][]=$row["time"];
         }
+        $clockify_entries = json_decode($clockify_data,true);
+        $totalInterval = new DateInterval("PT0H");
+        foreach ($clockify_entries as $entry){
+            if(isset($entry["timeInterval"]["duration"])&&$entry["timeInterval"]["duration"]!=null) {
+                $totalInterval = $this->AddTimeIntervals($totalInterval, new DateInterval($entry["timeInterval"]["duration"]));
+            }
+        }
         $retval = array();
         foreach ($values as $key=>$value){
             $retval[$key]=$this->CalculateTotalTime($value);
+        }
+        $clockify_total = ($totalInterval->d*24+$totalInterval->h).":".$totalInterval->i.":".$totalInterval->s;
+        if(isset($retval["Partners"])){
+            $retval["Partners"]=$this->CalculateTotalTime(array($retval["Partners"], $clockify_total));
+        }
+        else{
+            $retval["Partners"]=$clockify_total;
         }
         return $retval;
     }
