@@ -22,33 +22,43 @@ $list_of_days = ["Mon" => "po", "Tue" => "ut", "Wed" => "st", "Thu" => "št", "F
 $start_date = "01-" . $month . "-" . $year;
 $start_time = strtotime($start_date);
 $end_time = strtotime("+1 month", $start_time);
+$closed_month_data = $service->GetWorkerMonthClosedData($worker_id, $year."-".$month);
+$clockify_data = "";
 for ($i = $start_time; $i < $end_time; $i += 86400) {
     $list_of_dates[] = array(date('d.m.Y', $i), date('D', $i), date("Y-m-d", $i));
 }
 $done_days = $service->GetDoneWorkerWorkDays($worker_id, $month, $year);
-if($worker->clockify_api_key != ""){
-    $builder = new JDecool\Clockify\ClientBuilder();
-    $client = $builder->createClientV1($worker->clockify_api_key);
-    $apiFactory = new JDecool\Clockify\ApiFactory($client);
-    $userApi = $apiFactory->userApi();
-
-    $user = $userApi->current();
-    $entries = $client->get("workspaces/".$user->activeWorkspace()
-        ."/user/".$user->id()."/time-entries?start=".date("Y-m-d\TH:i:s\Z", strtotime($start_date)).
-        "&end=".date("Y-m-d\TH:i:s\Z", strtotime($start_date ." +1 month")));
-
-    foreach($done_days as $date=>$day){
-        if($day["break_end"] == null){
-            $entries[] = $service->DayFromDbToClockifyFormat($day["work_day_date"], $day["begin_time"], $day["end_time"], $day["description"]);
-        }
-        else{
-            $entries[] = $service->DayFromDbToClockifyFormat($day["work_day_date"], $day["begin_time"], $day["break_begin"], $day["description"]);
-            $entries[] = $service->DayFromDbToClockifyFormat($day["work_day_date"], $day["break_end"], $day["end_time"], "");
-        }
-    }
-    $worker_workdays = $service->ClockifyEntriesToDayFormat($entries);
-    $done_days = $worker_workdays;
+$entries = array();
+if($closed_month_data && $closed_month_data["to_be_reworked"]==0){
+    $entries = json_decode($closed_month_data["clockify_data"]);
 }
+else{
+    if($worker->clockify_api_key != "") {
+        $builder = new JDecool\Clockify\ClientBuilder();
+        $client = $builder->createClientV1($worker->clockify_api_key);
+        $apiFactory = new JDecool\Clockify\ApiFactory($client);
+        $userApi = $apiFactory->userApi();
+
+        $user = $userApi->current();
+        $entries = $client->get("workspaces/" . $user->activeWorkspace()
+            . "/user/" . $user->id() . "/time-entries?start=" . date("Y-m-d\TH:i:s\Z", strtotime($start_date)) .
+            "&end=" . date("Y-m-d\TH:i:s\Z", strtotime($start_date . " +1 month")));
+        $clockify_data = json_encode($entries);
+    }
+}
+
+foreach($done_days as $date=>$day){
+    if($day["break_end"] == null){
+        $entries[] = $service->DayFromDbToClockifyFormat($day["work_day_date"], $day["begin_time"], $day["end_time"], $day["description"], $day["id"]);
+    }
+    else{
+        $entries[] = $service->DayFromDbToClockifyFormat($day["work_day_date"], $day["begin_time"], $day["break_begin"], $day["description"], $day["id"]);
+        $entries[] = $service->DayFromDbToClockifyFormat($day["work_day_date"], $day["break_end"], $day["end_time"], "", $day["id"]);
+    }
+}
+$worker_workdays = $service->ClockifyEntriesToDayFormat($entries);
+$done_days = $worker_workdays;
+
 $total_time = array();
 $sum_unitl_now = "00:00";
 $overflow=false;
@@ -128,6 +138,7 @@ include "message_bar.php";
                         $row["break_begin"] = null;
                         $row["break_end"] = null;
                         $row["description"] = null;
+                        $row["projectString"] = null;
                     }
                     if ($day == 'nedeľa')
                         $class = 'sun';
@@ -156,7 +167,7 @@ include "message_bar.php";
 
                     echo("<td class='export_table_cell " . $class . " total'>" . ($overflow ? "" :$day_time) . "</td>");
                     echo("<td class='export_table_cell " . $class . "'>" . ($overflow ? "" :$row['description']) . "</td>");
-                    echo("<td class='export_table_cell " . $class . " last'>" . ($overflow ? "" :($row["id"] == -1 ? "" : $service->GetProjectsStringForWorkersWorkday($row["id"]))) . "</td>");
+                    echo("<td class='export_table_cell " . $class . " last'>" . ($overflow ? "" :$row["projectString"])."</td>");
                     echo("</tr>");
                 }
                 ?>
@@ -196,11 +207,14 @@ include "message_bar.php";
         </div>
         <?php
         $rework = false;
-        if (!($closed = $service->WorkerHasMonthClosed($worker_id, $year."-".$month)) && !($rework = $service->WorkerHasMonthForRework($worker_id, $year."-".$month)) && ($_SESSION["user_id"] == $worker_id || $_SESSION["user_role"] == 1)) { ?>
+        $closed = $closed_month_data && $closed_month_data["to_be_reworked"]==0;
+        $rework = $closed_month_data && $closed_month_data["to_be_reworked"]==1;
+        if (!$closed && !$rework && ($_SESSION["user_id"] == $worker_id || $_SESSION["user_role"] == 1)) { ?>
             <div class="col-12 mt-1">
                 <form action="submit_close_month.php" method="post">
                     <input type="hidden" value="<?= $worker_id ?>" name="worker_id">
                     <input type="hidden" value="<?= $year."-".$month ?>" name="month">
+                    <input type="hidden" value="<?= $clockify_data ?>" name="clockify_data">
                     <input class="btn btn-primary" name="submit" value="Uzavrieť mesiac" type="submit">
                 </form>
             </div>
@@ -243,6 +257,7 @@ include "message_bar.php";
                 <form action="submit_close_month_correction.php" method="post">
                     <input type="hidden" value="<?= $worker_id ?>" name="worker_id">
                     <input type="hidden" value="<?= $year."-".$month ?>" name="month">
+                    <input type="hidden" value="<?= $clockify_data ?>" name="clockify_data">
                     <input class="btn btn-primary" name="submit" value="Uzavrieť mesiac (oprava)" type="submit">
                 </form>
             </div>

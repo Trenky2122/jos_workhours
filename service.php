@@ -167,6 +167,7 @@ class Service
         $result = $stmt->get_result();
         $retval = array();
         while($row = $result->fetch_assoc()){
+            $row["projectString"] = $this->GetProjectsStringForWorkersWorkday($row["id"]);
             $retval[$row['work_day_date']] = $row;
         }
         return $retval;
@@ -479,7 +480,7 @@ class Service
         return $stmt->execute();
     }
 
-    public function GetProjectsStringForWorkersWorkday($worker_workday_id): string
+    public function GetProjectsStringForWorkersWorkday($worker_workday_id, $partners = false): string
     {
         $sql="SELECT p.name FROM projects p, workers_workday w, workday_project wp WHERE 
                 w.id=? AND p.id=wp.project_id AND wp.worker_workday_id = w.id";
@@ -491,6 +492,10 @@ class Service
         $stmt->execute();
         $result = $stmt->get_result();
         $first = true;
+        if($partners){
+            $first = false;
+            $retval = "Partners";
+        }
         while ($row = $result->fetch_assoc()){
             //echo json_encode($row);
             if(!$first) {
@@ -629,10 +634,21 @@ class Service
         return $result->num_rows > 0;
     }
 
-    public function CloseMonthForWorker($worker_id, $month){
-        $sql = "INSERT INTO closed_months(worker_id, month) VALUES (?,?)";
+    public function GetWorkerMonthClosedData($worker_id, $month): array|bool|null{
+        $sql = "SELECT * FROM closed_months WHERE worker_id=? AND month=?";
         $stmt = $this->mysqli->prepare($sql);
         $stmt->bind_param("is", $worker_id, $month);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $retval = $result->fetch_assoc();
+        return $retval;
+    }
+
+    public function CloseMonthForWorker($worker_id, $month, $clockify_data): int
+    {
+        $sql = "INSERT INTO closed_months(worker_id, month, clockify_data) VALUES (?,?, ?)";
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("iss", $worker_id, $month, $clockify_data);
         $stmt->execute();
         return $stmt->errno;
     }
@@ -654,11 +670,11 @@ class Service
         return $stmt->errno;
     }
 
-    public function MarkWorkerMonthAsReworked($worker_id, $month): int
+    public function MarkWorkerMonthAsReworked($worker_id, $month, $clockify_data): int
     {
-        $sql = "UPDATE closed_months SET to_be_reworked=0 WHERE worker_id=? AND month=?";
+        $sql = "UPDATE closed_months SET to_be_reworked=0, clockify_data=? WHERE worker_id=? AND month=?";
         $stmt = $this->mysqli->prepare($sql);
-        $stmt->bind_param("is", $worker_id, $month);
+        $stmt->bind_param("sis", $clockify_data, $worker_id, $month);
         $stmt->execute();
         return $stmt->errno;
     }
@@ -681,7 +697,7 @@ class Service
         return $f->diff($e);
     }
 
-    public function DayFromDbToClockifyFormat($date, $start, $end, $description): array
+    public function DayFromDbToClockifyFormat($date, $start, $end, $description, $id): array
     {
         $day_in_clockify_format = array();
         $day_in_clockify_format["timeInterval"] = array();
@@ -690,6 +706,7 @@ class Service
         $day_in_clockify_format["timeInterval"]["start"] = $dateTimeStart->format(DATE_ATOM);
         $day_in_clockify_format["timeInterval"]["end"] = $dateTimeEnd->format(DATE_ATOM);
         $day_in_clockify_format["description"] = $description;
+        $day_in_clockify_format["id"] = $id;
         return $day_in_clockify_format;
     }
 
@@ -746,9 +763,17 @@ class Service
             for($i=0; $i<count($dayEntries)-1; $i++){
                 $break_begin_time = new DateTime($dayEntries[$i]["timeInterval"]["end"]);
                 $break_end_time = new DateTime($dayEntries[$i+1]["timeInterval"]["start"]);
+                if(is_numeric($dayEntries[$i]["id"]))
+                    $worker_workday["id"]=$dayEntries[$i]["id"];
                 $difference = $break_begin_time->diff($break_end_time);
                 $total_break_time = $this->AddTimeIntervals($total_break_time, $difference);
             }
+            $wasPartnersDoneThatDay = false;
+            foreach ($dayEntries as $dayEntry){
+                if(!is_numeric($dayEntry["id"]))
+                    $wasPartnersDoneThatDay = true;
+            }
+            $worker_workday["projectString"] = $this->GetProjectsStringForWorkersWorkday($worker_workday["id"], $wasPartnersDoneThatDay);
             $break_begin_time = new DateTime($dayEntries[0]["timeInterval"]["end"]);
             $break_end_time = $break_begin_time->add($total_break_time);
             $worker_workday["break_end"] = $break_end_time->format("H:i:s");
