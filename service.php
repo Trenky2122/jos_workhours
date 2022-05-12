@@ -634,7 +634,7 @@ class Service
         return $result->num_rows > 0;
     }
 
-    public function GetWorkerMonthClosedData($worker_id, $month): array|bool|null{
+    public function GetWorkerMonthClosedData($worker_id, $month){
         $sql = "SELECT * FROM closed_months WHERE worker_id=? AND month=?";
         $stmt = $this->mysqli->prepare($sql);
         $stmt->bind_param("is", $worker_id, $month);
