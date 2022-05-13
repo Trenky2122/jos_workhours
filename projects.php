@@ -41,7 +41,7 @@ if(isset($_GET["to"])&&!empty($_GET["to"]))
                 ?>
                 <tr>
                     <td style="border-bottom: black solid 1px; border-top: black solid 2px"><strong><?=$project->name?></strong></td>
-                    <td style="border-bottom: black solid 1px; border-top: black solid 2px"><?=$service->GetProjectTimeSince($project->id, $from, $to)?></td>
+                    <td style="border-bottom: black solid 1px; border-top: black solid 2px"><?=$service->NormalizeTime($service->GetProjectTimeSince($project->id, $from, $to))?></td>
                     <td style="border-bottom: black solid 1px; border-top: black solid 2px"><?=$project->active?"áno":"nie"?></td>
                     <td style="border-bottom: black solid 1px; border-top: black solid 2px">
                         <form action="project_action.php" method="post">
@@ -56,7 +56,7 @@ if(isset($_GET["to"])&&!empty($_GET["to"]))
                     ?>
                     <tr>
                         <td><?=$name?></td>
-                        <td><?=$time?></td>
+                        <td><?=$service->NormalizeTime($time)?></td>
                         <td></td>
                         <td></td>
                     </tr>

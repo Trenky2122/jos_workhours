@@ -2,6 +2,7 @@
 
 include "models.php";
 include_once "config.php";
+require_once './vendor/autoload.php';
 //include_once "config_local.php";
 
 
@@ -450,6 +451,10 @@ class Service
 
     public function GetProjectTimeSince($project_id, $from, $to): string
     {
+        if($project_id == 8){
+            $totalData = $this->GetWorkerDataForProjectPartners($from, $to);
+            return $this->CalculateTotalTime(array_values($totalData));
+        }
         $sql = "SELECT time FROM workers_workday w, workday_project p WHERE p.worker_workday_id = w.id AND p.project_id=? 
                 AND w.work_day_date>=? AND w.work_day_date<=? AND w.done=1";
         $stmt = $this->mysqli->prepare($sql);
@@ -522,8 +527,55 @@ class Service
         return $this->mysqli->connect_errno == 0;
     }
 
+    /**
+     * @return Worker[]
+     */
+    public function GetAllClockifyWorkers(): array
+    {
+        $result = $this->mysqli->query("SELECT name, surname, id, password_hash, member_since, is_admin, email,
+       clockify_api_key FROM workers WHERE clockify_api_key <> '' ");
+        $retval = array();
+        while ($row = $result->fetch_object("Worker")) {
+            $retval[] = $row;
+        }
+        return $retval;
+    }
+
+    function NormalizeTime($time): string
+    {
+        $timeSplit = explode(":", $time);
+        $hours = intval($timeSplit[0]);
+        return $hours.":".$timeSplit[1];
+    }
+
+    public function GetWorkerDataForProjectPartners($from, $to){
+        $workers = $this -> GetAllClockifyWorkers();
+        $builder = new JDecool\Clockify\ClientBuilder();
+        $retval = array();
+        foreach ($workers as $worker){
+            $client = $builder->createClientV1($worker->clockify_api_key);
+            $apiFactory = new JDecool\Clockify\ApiFactory($client);
+            $userApi = $apiFactory->userApi();
+
+            $user = $userApi->current();
+            $entries = $client->get("workspaces/" . $user->activeWorkspace()
+                . "/user/" . $user->id() . "/time-entries?start=" . date("Y-m-d\TH:i:s\Z", strtotime($from)) .
+                "&end=" . date("Y-m-d\TH:i:s\Z", strtotime($to)));
+            $timeInterval = new DateInterval("PT0H");
+            foreach ($entries as $entry){
+                if($entry["timeInterval"]["duration"]==null)
+                    continue;
+                $timeInterval = $this->AddTimeIntervals($timeInterval, new DateInterval($entry["timeInterval"]["duration"]));
+            }
+            $retval[$worker->GetFullName()] = ($timeInterval->d * 24 + $timeInterval->h) . ":".($timeInterval->i<10?"0":"") . $timeInterval->i;
+        }
+        return $retval;
+    }
+
     public function GetWorkerDataForProject($project_id, $from, $to): array
     {
+        if($project_id == 8)
+            return $this->GetWorkerDataForProjectPartners($from, $to);
         $sql = "SELECT u.name, u.surname, time FROM workers_workday w, workday_project p, workers u WHERE p.worker_workday_id = w.id AND p.project_id=? 
                 AND u.id=w.worker_id AND w.work_day_date>=? AND w.work_day_date<=? AND w.done=1";
         $stmt = $this->mysqli->prepare($sql);
@@ -780,15 +832,17 @@ class Service
             for($i=0; $i<count($dayEntries)-1; $i++){
                 $break_begin_time = new DateTime($dayEntries[$i]["timeInterval"]["end"]);
                 $break_end_time = new DateTime($dayEntries[$i+1]["timeInterval"]["start"]);
-                if(is_numeric($dayEntries[$i]["id"]))
-                    $worker_workday["id"]=$dayEntries[$i]["id"];
                 $difference = $break_begin_time->diff($break_end_time);
                 $total_break_time = $this->AddTimeIntervals($total_break_time, $difference);
             }
             $wasPartnersDoneThatDay = false;
             foreach ($dayEntries as $dayEntry){
-                if(!is_numeric($dayEntry["id"]))
+                if(!is_numeric($dayEntry["id"])) {
                     $wasPartnersDoneThatDay = true;
+                }
+                else{
+                    $worker_workday["id"] = $dayEntry["id"];
+                }
             }
             $worker_workday["projectString"] = $this->GetProjectsStringForWorkersWorkday($worker_workday["id"], $wasPartnersDoneThatDay);
             $break_begin_time = new DateTime($dayEntries[0]["timeInterval"]["end"]);

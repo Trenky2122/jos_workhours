@@ -75,12 +75,6 @@ if(isset($_GET["limit"])){
         }
     }
 }
-function normalizeTime($time): string
-{
-    $timeSplit = explode(":", $time);
-    $hours = intval($timeSplit[0]);
-    return $hours.":".$timeSplit[1];
-}
 include "message_bar.php";
 ?>
 
@@ -173,13 +167,13 @@ include "message_bar.php";
                 ?>
                 <tr>
                     <td colspan="5" class="sum export_table_cell"><strong>Suma:</strong></td>
-                    <td class="sum export_table_cell"><strong><?= normalizeTime($service->CalculateTotalTime($total_time)) ?></strong></td>
+                    <td class="sum export_table_cell"><strong><?= $service->NormalizeTime($service->CalculateTotalTime($total_time)) ?></strong></td>
                     <td class="sum export_table_cell" colspan="2">
                         <?php
                         if(!$overflow) {
                             $projectData = $service->GetProjectDataForWorker($worker_id, $list_of_dates[0][2], end($list_of_dates)[2], $clockify_data);
                             foreach ($projectData as $key => $value) {
-                                echo "<strong>" . $key . "</strong>: " . normalizeTime($value) . "&emsp;&emsp;&emsp;&emsp;";
+                                echo "<strong>" . $key . "</strong>: " . $service->NormalizeTime($value) . "&emsp;&emsp;&emsp;&emsp;";
                             }
                         }
                         ?>
