@@ -614,23 +614,26 @@ class Service
             }
             $values[$row["name"]][]=$row["time"];
         }
-        $clockify_entries = json_decode($clockify_data,true);
-        $totalInterval = new DateInterval("PT0H");
-        foreach ($clockify_entries as $entry){
-            if(isset($entry["timeInterval"]["duration"])&&$entry["timeInterval"]["duration"]!=null) {
-                $totalInterval = $this->AddTimeIntervals($totalInterval, new DateInterval($entry["timeInterval"]["duration"]));
-            }
-        }
+
         $retval = array();
         foreach ($values as $key=>$value){
             $retval[$key]=$this->CalculateTotalTime($value);
         }
-        $clockify_total = ($totalInterval->d*24+$totalInterval->h).":".$totalInterval->i.":".$totalInterval->s;
-        if(isset($retval["Partners"])){
-            $retval["Partners"]=$this->CalculateTotalTime(array($retval["Partners"], $clockify_total));
-        }
-        else{
-            $retval["Partners"]=$clockify_total;
+
+        if($clockify_data) {
+            $clockify_entries = json_decode($clockify_data, true);
+            $totalInterval = new DateInterval("PT0H");
+            foreach ($clockify_entries as $entry) {
+                if (isset($entry["timeInterval"]["duration"]) && $entry["timeInterval"]["duration"] != null) {
+                    $totalInterval = $this->AddTimeIntervals($totalInterval, new DateInterval($entry["timeInterval"]["duration"]));
+                }
+            }
+            $clockify_total = ($totalInterval->d * 24 + $totalInterval->h) . ":" . $totalInterval->i . ":" . $totalInterval->s;
+            if (isset($retval["Partners"])) {
+                $retval["Partners"] = $this->CalculateTotalTime(array($retval["Partners"], $clockify_total));
+            } else {
+                $retval["Partners"] = $clockify_total;
+            }
         }
         return $retval;
     }
