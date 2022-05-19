@@ -1,17 +1,25 @@
 function recalculateHours(element_id) {
     let begin_time = document.getElementById(element_id + "_begin_time").value;
     let end_time = document.getElementById(element_id + "_end_time").value;
+    let breakOk = true;
+    let break_begin = '';
+    let break_end = '';
     if (begin_time && end_time) {
         let time = calculateTimeDifference(begin_time, end_time);
-        let break_begin = document.getElementById(element_id + "_break_begin").value;
-        let break_end = document.getElementById(element_id + "_break_end").value;
+        break_begin = document.getElementById(element_id + "_break_begin").value;
+        break_end = document.getElementById(element_id + "_break_end").value;
+        breakOk = (break_begin && break_end) || (!break_begin && !break_end);
         if (break_begin && break_end) {
             time = calculateTimeDifference(calculateTimeDifference(break_begin, break_end), time);
+            breakOk = break_end>=break_begin;
         }
         document.getElementById(element_id).innerHTML = time;
     } else {
         document.getElementById(element_id).innerHTML = "0:00";
     }
+    console.log(breakOk && begin_time<=end_time && (break_begin == null || (begin_time<=break_begin && end_time>=break_end)));
+    console.log(breakOk , begin_time,end_time , break_begin, break_end);
+    return breakOk && begin_time<=end_time && (break_begin == '' || (begin_time<=break_begin && end_time>=break_end));
 }
 
 function calculateTimeDifference(time_begin, time_end) {

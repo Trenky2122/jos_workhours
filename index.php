@@ -101,14 +101,14 @@ include "message_bar.php";
                 $projectData = $service->GetProjectDataForWorkday($workerData->id);
                 ?>
                 <form method="post" action="submit_workday.php" onkeydown="return event.key != 'Enter';"
-                      onsubmit="return verifyProjectInputs('projects_<?= $day->day ?>',
+                      onsubmit="return recalculateHours('total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>')&&(verifyProjectInputs('projects_<?= $day->day ?>',
                               'total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>',
                               'project_<?= $worker->id . "_" . $day->day_of_week ?>',
                               'done_<?= $worker->id . "_" . $day->day_of_week ?>') ||
                               verifyProjectInputs('projects_m_<?= $day->day ?>',
                               'total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>',
                               'project_<?= $worker->id . "_" . $day->day_of_week ?>',
-                              'done_<?= $worker->id . "_" . $day->day_of_week ?>')">
+                              'done_<?= $worker->id . "_" . $day->day_of_week ?>'))">
                     <div class="row <?= "day_" . $day->day . " worker_" . $worker->id ?> table-row-index">
                         <div class="col-xxl-1 col-12"><?= $list_of_days[date("D", strtotime($day->day))] . " " . date("d.m.Y", strtotime($day->day)) ?></div>
 
@@ -211,7 +211,7 @@ include "message_bar.php";
                                     value="Uložiť" "><?php } ?>
                         </div>
                         <script>
-                            document.getElementById("total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>").addEventListener("load", recalculateHours("total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>"))
+                             recalculateHours("total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>");
                         </script>
                     </div>
                 </form>
