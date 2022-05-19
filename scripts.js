@@ -17,8 +17,6 @@ function recalculateHours(element_id) {
     } else {
         document.getElementById(element_id).innerHTML = "0:00";
     }
-    console.log(breakOk && begin_time<=end_time && (break_begin == null || (begin_time<=break_begin && end_time>=break_end)));
-    console.log(breakOk , begin_time,end_time , break_begin, break_end);
     return breakOk && begin_time<=end_time && (break_begin == '' || (begin_time<=break_begin && end_time>=break_end));
 }
 
