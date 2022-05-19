@@ -31,6 +31,7 @@ $done_days = $service->GetDoneWorkerWorkDays($worker_id, $month, $year);
 $entries = array();
 if($closed_month_data && $closed_month_data["to_be_reworked"]==0){
     $entries = json_decode($closed_month_data["clockify_data"], true);
+    $clockify_data = $closed_month_data["clockify_data"];
 }
 else{
     if($worker->clockify_api_key != "") {
@@ -41,7 +42,7 @@ else{
 
         $user = $userApi->current();
         $entries = $client->get("workspaces/" . $user->activeWorkspace()
-            . "/user/" . $user->id() . "/time-entries?start=" . date("Y-m-d\TH:i:s\Z", strtotime($start_date)) .
+            . "/user/" . $user->id() . "/time-entries?page-size=5000&start=" . date("Y-m-d\TH:i:s\Z", strtotime($start_date)) .
             "&end=" . date("Y-m-d\TH:i:s\Z", strtotime($start_date . " +1 month")));
         $clockify_data = json_encode($entries);
     }

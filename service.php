@@ -559,7 +559,7 @@ class Service
 
             $user = $userApi->current();
             $entries = $client->get("workspaces/" . $user->activeWorkspace()
-                . "/user/" . $user->id() . "/time-entries?start=" . date("Y-m-d\TH:i:s\Z", strtotime($from)) .
+                . "/user/" . $user->id() . "/time-entries?page-size=5000&start=" . date("Y-m-d\TH:i:s\Z", strtotime($from)) .
                 "&end=" . date("Y-m-d\TH:i:s\Z", strtotime($to)));
             $timeInterval = new DateInterval("PT0H");
             foreach ($entries as $entry){
