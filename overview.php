@@ -88,6 +88,29 @@ include "message_bar.php";
 
                 <?php
                 foreach ($workers as $worker) {
+                    $workdays = $service->GetWorkerWorkDays($worker->id, $days[0]->day, $days[5]->day);
+                    if($worker->clockify_api_key != "") {
+                        $builder = new JDecool\Clockify\ClientBuilder();
+                        $client = $builder->createClientV1($worker->clockify_api_key);
+                        $apiFactory = new JDecool\Clockify\ApiFactory($client);
+                        $userApi = $apiFactory->userApi();
+
+                        $user = $userApi->current();
+                        $entries = $client->get("workspaces/" . $user->activeWorkspace()
+                            . "/user/" . $user->id() . "/time-entries?page-size=5000&start=" . date("Y-m-d\TH:i:s\Z", strtotime($days[0]->day)) .
+                            "&end=" . date("Y-m-d\TH:i:s\Z", strtotime($days[0]->day . " +1 week")));
+                        foreach($workdays as $date=>$day){
+                            if($day["break_end"] == null){
+                                $entries[] = $service->DayFromDbToClockifyFormat($day["work_day_date"], $day["begin_time"], $day["end_time"], $day["description"], $day["id"]);
+                            }
+                            else{
+                                $entries[] = $service->DayFromDbToClockifyFormat($day["work_day_date"], $day["begin_time"], $day["break_begin"], $day["description"], $day["id"]);
+                                $entries[] = $service->DayFromDbToClockifyFormat($day["work_day_date"], $day["break_end"], $day["end_time"], "", $day["id"]);
+                            }
+                        }
+                        $workdays = $service->ClockifyEntriesToDayFormat($entries);
+                    }
+
                     ?>
                     <tr class="table-row worker_<?= $worker->id ?> worker_name">
                         <td><strong><?= $worker->GetFullName() ?></strong></td>
@@ -96,17 +119,30 @@ include "message_bar.php";
                     </tr>
                     <?php
                     foreach ($days as $day) {
-                        $workerData = $service->GetWorkerWorkDay($worker->id, $day);
-                        $projectData = $service->GetProjectDataForWorkday($workerData->id);
+                        $workerData = array();
+                        if(!isset($workdays[$day->day])){
+                            $workerData = array();
+                            $workerData["begin_time"]=null;
+                            $workerData["end_time"]=null;
+                            $workerData["break_begin"]=null;
+                            $workerData["break_end"]=null;
+                            $workerData["description"]=null;
+                            $workerData["id"]=null;
+                            $workerData["done"]=null;
+                        }
+                        else{
+                            $workerData = $workdays[$day->day];
+                        }
+                        $projectData = $service->GetProjectDataForWorkday($workerData["id"]);
                         ?>
                         <tr class="<?= "day_" . $day->day . " worker_" . $worker->id ?> table-row">
                             <td><?= $list_of_days[date("D", strtotime($day->day))]."<br>".date("d.m.Y", strtotime($day->day)) ?></td>
-                                <td><?= substr($workerData->begin_time,0,  5) ?></td>
-                                <td><?= substr($workerData->end_time,0,  5) ?></td>
-                                <td><?= substr($workerData->break_begin,0,  5) ?></td>
-                                <td><?= substr($workerData->break_end,0,  5) ?></td>
-                                <td><?= $service->CalculateDayTime($workerData->begin_time, $workerData->end_time, $workerData->break_begin, $workerData->break_end) ?></td>
-                                <td><?= $workerData->description ?></td>
+                                <td><?= substr($workerData["begin_time"],0,  5) ?></td>
+                                <td><?= substr($workerData["end_time"],0,  5) ?></td>
+                                <td><?= substr($workerData["break_begin"],0,  5) ?></td>
+                                <td><?= substr($workerData["break_end"],0,  5) ?></td>
+                                <td><?= $service->CalculateDayTime($workerData["begin_time"], $workerData["end_time"], $workerData["break_begin"], $workerData["break_end"]) ?></td>
+                                <td><?= $workerData["description"] ?></td>
                                 <td>
                                     <a class="btn btn-primary" data-toggle="collapse"
                                        href="#project_<?= $worker->id . "_" . $day->day_of_week ?>" role="button"
@@ -116,7 +152,7 @@ include "message_bar.php";
                                     </a>
                                     <div class="collapse" id="project_<?= $worker->id . "_" . $day->day_of_week ?>">
                                         <div class="container-fluid">
-                                            <?php $projects = $service->GetRelevantProjectsForDay($workerData->id);
+                                            <?php $projects = $service->GetRelevantProjectsForDay($workerData["id"]);
                                             foreach ($projects as $project) {
                                                 ?>
                                                 <div class="row">
@@ -134,7 +170,7 @@ include "message_bar.php";
                                     </div>
                                 </td>
                                 <td><input type="checkbox"
-                                           name="done" onclick="return false" <?php if ($workerData->done) echo "checked" ?> style="">
+                                           name="done" onclick="return false" <?php if ($workerData["done"]) echo "checked" ?> style="">
                                 </td>
                         </tr>
                         <?php

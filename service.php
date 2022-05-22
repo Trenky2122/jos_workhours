@@ -56,7 +56,6 @@ class Service
             $day->week = $week . "/" . substr($year, 2);
             $day->month = date("m", strtotime($string_date . " +" . $i . " day")) . "/" . date("y", strtotime($string_date . " +" . $i . " day"));
             $day->day_of_week = $days_of_week[$i];
-            //array_push($retval, $this->CreateOrGetWorkday($day));
             $retval[] = $day;
         }
         return $retval;
@@ -169,6 +168,21 @@ class Service
         $retval = array();
         while($row = $result->fetch_assoc()){
             $row["projectString"] = $this->GetProjectsStringForWorkersWorkday($row["id"]);
+            $retval[$row['work_day_date']] = $row;
+        }
+        return $retval;
+    }
+
+    public function GetWorkerWorkDays($worker_id, $from, $to): array
+    {
+        $sql = "SELECT id, begin_time, end_time, break_begin, break_end, description, work_day_date, done FROM workers_workday";
+        $sql.= " WHERE worker_id=? AND work_day_date>=? AND work_day_date<=?";
+        $stmt = $this->mysqli->prepare( $sql);
+        $stmt->bind_param("iss", $worker_id, $from, $to);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $retval = array();
+        while($row = $result->fetch_assoc()){
             $retval[$row['work_day_date']] = $row;
         }
         return $retval;
@@ -390,7 +404,6 @@ class Service
     public function TimeIs0($time): bool
     {
         $myArray = str_split($time);
-        //echo json_encode($myArray);
         foreach($myArray as $character){
             if($character != "0" && $character != ":" &&$character!="") {
                 return false;
@@ -465,7 +478,6 @@ class Service
         while($row = $result->fetch_array(MYSQLI_NUM)){
             $results[] = $row[0];
         }
-        //echo json_encode($results);
         if($results == null)
             $results = array();
         return $this->CalculateTotalTime($results);
@@ -502,7 +514,6 @@ class Service
             $retval = "Partners";
         }
         while ($row = $result->fetch_assoc()){
-            //echo json_encode($row);
             if(!$first) {
                 $retval .= ", ";
             }
@@ -808,12 +819,14 @@ class Service
         foreach ($entries as $entry){
             $entriesByDate[date("Y-m-d", strtotime($entry["timeInterval"]["start"]))][]=$entry;
         }
-        function cmp($a, $b): int
-        {
-            if ($a["timeInterval"]["start"] == $b["timeInterval"]["start"]) {
-                return 0;
+        if(!function_exists("cmp")) {
+            function cmp($a, $b): int
+            {
+                if ($a["timeInterval"]["start"] == $b["timeInterval"]["start"]) {
+                    return 0;
+                }
+                return ($a["timeInterval"]["start"] < $b["timeInterval"]["start"]) ? -1 : 1;
             }
-            return ($a["timeInterval"]["start"] < $b["timeInterval"]["start"]) ? -1 : 1;
         }
         $worker_workdays = array();
         foreach ($entriesByDate as $date=>$dayEntries){
@@ -821,6 +834,7 @@ class Service
             $worker_workday["id"]=-2;
             $worker_workday["work_day_date"] = $date;
             $worker_workday["description"] = "";
+            $worker_workday["done"] = true;
             foreach ($dayEntries as $dayEntry){
                 $worker_workday["description"] .= " ".$dayEntry["description"];
             }
