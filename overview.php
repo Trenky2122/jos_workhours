@@ -89,6 +89,7 @@ include "message_bar.php";
                 <?php
                 foreach ($workers as $worker) {
                     $workdays = $service->GetWorkerWorkDays($worker->id, $days[0]->day, $days[5]->day);
+                    $clockify_entries = array();
                     if($worker->clockify_api_key != "") {
                         $builder = new JDecool\Clockify\ClientBuilder();
                         $client = $builder->createClientV1($worker->clockify_api_key);
@@ -96,19 +97,19 @@ include "message_bar.php";
                         $userApi = $apiFactory->userApi();
 
                         $user = $userApi->current();
-                        $entries = $client->get("workspaces/" . $user->activeWorkspace()
+                        $clockify_entries = $client->get("workspaces/" . $user->activeWorkspace()
                             . "/user/" . $user->id() . "/time-entries?page-size=5000&start=" . date("Y-m-d\TH:i:s\Z", strtotime($days[0]->day)) .
                             "&end=" . date("Y-m-d\TH:i:s\Z", strtotime($days[0]->day . " +1 week")));
                         foreach($workdays as $date=>$day){
                             if($day["break_end"] == null){
-                                $entries[] = $service->DayFromDbToClockifyFormat($day["work_day_date"], $day["begin_time"], $day["end_time"], $day["description"], $day["id"]);
+                                $clockify_entries[] = $service->DayFromDbToClockifyFormat($day["work_day_date"], $day["begin_time"], $day["end_time"], $day["description"], $day["id"]);
                             }
                             else{
-                                $entries[] = $service->DayFromDbToClockifyFormat($day["work_day_date"], $day["begin_time"], $day["break_begin"], $day["description"], $day["id"]);
-                                $entries[] = $service->DayFromDbToClockifyFormat($day["work_day_date"], $day["break_end"], $day["end_time"], "", $day["id"]);
+                                $clockify_entries[] = $service->DayFromDbToClockifyFormat($day["work_day_date"], $day["begin_time"], $day["break_begin"], $day["description"], $day["id"]);
+                                $clockify_entries[] = $service->DayFromDbToClockifyFormat($day["work_day_date"], $day["break_end"], $day["end_time"], "", $day["id"]);
                             }
                         }
-                        $workdays = $service->ClockifyEntriesToDayFormat($entries);
+                        $workdays = $service->ClockifyEntriesToDayFormat($clockify_entries);
                     }
 
                     ?>
@@ -133,7 +134,6 @@ include "message_bar.php";
                         else{
                             $workerData = $workdays[$day->day];
                         }
-                        $projectData = $service->GetProjectDataForWorkday($workerData["id"]);
                         ?>
                         <tr class="<?= "day_" . $day->day . " worker_" . $worker->id ?> table-row">
                             <td><?= $list_of_days[date("D", strtotime($day->day))]."<br>".date("d.m.Y", strtotime($day->day)) ?></td>
@@ -152,15 +152,16 @@ include "message_bar.php";
                                     </a>
                                     <div class="collapse" id="project_<?= $worker->id . "_" . $day->day_of_week ?>">
                                         <div class="container-fluid">
-                                            <?php $projects = $service->GetRelevantProjectsForDay($workerData["id"]);
-                                            foreach ($projects as $project) {
+                                            <?php
+                                            $projectsData = $service->GetWorkedProjectsForWorkday($day->day, $worker->id, $clockify_entries);
+                                            foreach($projectsData as $name=>$time){
                                                 ?>
                                                 <div class="row">
                                                     <div class="col-6">
-                                                        <p><?= $project->name ?></p>
+                                                        <p><?= $name.": " ?></p>
                                                     </div>
                                                     <div class="col-6">
-                                                        <p><?php if(isset($projectData[$project->id])) echo(substr($projectData[$project->id],0, 5)); else echo("00:00") ?></p>
+                                                        <p><?= $service->NormalizeTime($time) ?></p>
                                                     </div>
                                                 </div>
                                                 <?php

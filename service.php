@@ -412,6 +412,36 @@ class Service
         return true;
     }
 
+    public function GetWorkedProjectsForWorkday($date, $worker_id, $clockify_entries): array{
+        $sql = "SELECT * FROM workday_project p, workers_workday d, projects pr WHERE pr.id=p.project_id 
+                                                                  AND p.worker_workday_id=d.id AND d.work_day_date=? 
+                                                                  AND d.worker_id=?";
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("si", $date, $worker_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $retval = array();
+        while ($row = $result->fetch_assoc()){
+            $retval[$row["name"]]=$row["time"];
+        }
+        $totalInterval = new DateInterval("PT0H");
+        foreach ($clockify_entries as $entry) {
+            if (isset($entry["timeInterval"]["duration"]) && $entry["timeInterval"]["duration"] != null
+                && date("Y-m-d", strtotime($entry["timeInterval"]["start"])) == $date) {
+                $totalInterval = $this->AddTimeIntervals($totalInterval, new DateInterval($entry["timeInterval"]["duration"]));
+            }
+        }
+        $clockify_total = ($totalInterval->d * 24 + $totalInterval->h) . ":" . $totalInterval->i . ":" . $totalInterval->s;
+        if($clockify_total != '0:0:0') {
+            if (isset($retval["Partners"])) {
+                $retval["Partners"] = $this->CalculateTotalTime(array($retval["Partners"], $clockify_total));
+            } else {
+                $retval["Partners"] = $clockify_total;
+            }
+        }
+        return $retval;
+    }
+
     public function GetProjectDataForWorkday($worker_workday_id): array
     {
         if($worker_workday_id == 0)
