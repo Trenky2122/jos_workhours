@@ -18,14 +18,24 @@ if (isset($_GET['w'])) {
     $week = $arr[1];
     $year = $arr[0];
 }
-
+elseif (isset($_GET['d'])){
+    if(!(bool)strtotime($_GET['d'])){
+        die("Bad format date: " . $_GET["d"]);
+    }
+    $year = date("Y", strtotime($_GET['d']));
+    $month = date("m", strtotime($_GET['d']));
+    $week = date("W", strtotime($_GET['d']));
+}
 $days = $service->GetDaysInWeek($year, $week);
 $workers = $service->GetAllWorkers();
 $list_of_days = ["Mon" => "Pondelok", "Tue" => "Utorok", "Wed" => "Streda", "Thu" => "Štvrtok", "Fri" => "Piatok", "Sat" => "Sobota", "Sun" => "Nedeľa"];
+$lastweek_week = date("W", strtotime("+".($week-1)." week", strtotime("1.1.".$year)));
+$lastweek_year = date("Y", strtotime("+".($week-1)." week", strtotime("1.1.".$year)));
+$lastweek_date = date("Y-m-d", strtotime("+".($week-1)." week", strtotime("1.1.".$year)));
 include "message_bar.php";
 ?>
     <div class="row mt-2">
-        <div class="col-3">
+        <div class="col-6">
             <label for="worker_select">Filter zamestnanec</label>
             <select id="worker_select" onchange="reloadFilter()">
                 <option value="0">Všetci</option>
@@ -38,7 +48,7 @@ include "message_bar.php";
                 ?>
             </select>
         </div>
-        <div class="col-3">
+        <div class="col-6">
             <label for="day_select">Filter deň</label>
             <select id="day_select" onchange="reloadFilter()">
                 <option value="0">Celý týždeň</option>
@@ -51,16 +61,37 @@ include "message_bar.php";
                 ?>
             </select>
         </div>
+    </div>
+    <div class="row mt-1 d-none d-xxl-flex">
         <div class="col-6">
-            <form method="get" action="overview.php">
+            <form method="get" action="index.php">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-xl-6 col-10 col-lg-8">
+                        <div class="col-xxl-6 col-10 col-xxl-8">
                             <label for="week">Týždeň</label>
-                            <input type="week" id="week" name="w">
+                            <input type="week" id="week" name="w" value="<?=$lastweek_year."-W".$lastweek_week?>">
                         </div>
                         <div class="col-2">
                             <input type="submit" name="submit" value="Hľadať">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row mt-1 d-xxl-none">
+        <div class="col-12">
+            <form method="get" action="index.php">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <label for="day">Týždeň (ľubovoľný deň z neho):</label>
+                        </div>
+                        <div class="col-12">
+                            <input type="date" id="day" name="d" value="<?=$lastweek_date?>">
+                        </div>
+                        <div class="col-12">
+                            <input type="submit" name="submit" value="Hľadať" class="float-start">
                         </div>
                     </div>
                 </div>
