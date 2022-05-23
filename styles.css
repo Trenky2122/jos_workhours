@@ -1,5 +1,13 @@
 .table-row-index{
-    border-top: 1px solid gray;
+    border-top: 1px solid #cdc4cd;
     padding-top: 1ex;
     margin-bottom: 1ex;
+}
+
+.worker_name{
+    border-top: 1px solid black;
+}
+
+.monday{
+    border-top: 1px solid black;
 }

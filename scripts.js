@@ -42,23 +42,23 @@ function reloadFilter() {
         className += document.getElementById("worker_select").value;
 
         let elsToShow = document.getElementsByClassName("worker_name "+ className);
-        [].forEach.call(elsToShow, (el) => el.style.display = "table-row");
+        [].forEach.call(elsToShow, (el) => el.style.display = "flex");
     }
     else {
         let elsToShow = document.getElementsByClassName("worker_name");
-        [].forEach.call(elsToShow, (el) => el.style.display = "table-row");
+        [].forEach.call(elsToShow, (el) => el.style.display = "flex");
     }
     if (document.getElementById("day_select").value != "0") {
         className += " " + document.getElementById("day_select").value;
     }
     if (className == "") {
-        [].forEach.call(allRows, (element) => element.style.display = "table-row");
+        [].forEach.call(allRows, (element) => element.style.display = "flex");
         return;
     }
     if(className.charAt(0)==" ")
         className=className.substring(1);
     let elsToShow = document.getElementsByClassName(className);
-    [].forEach.call(elsToShow, (el) => el.style.display = "table-row");
+    [].forEach.call(elsToShow, (el) => el.style.display = "flex");
 }
 
 function verifyProjectInputs(classnameProjects, valueId, collapse, done){
