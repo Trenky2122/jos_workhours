@@ -75,7 +75,7 @@ include "message_bar.php";
         </form>
     </div>
 </div>
-<div class="row worker_<?= $worker->id ?> worker_name mb-1">
+<div class="row worker_<?= $worker->id ?> mb-1">
     <h1><strong><?= $worker->GetFullName() ?></strong></h1>
 </div>
 <div class="row">
