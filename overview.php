@@ -36,7 +36,7 @@ include "message_bar.php";
 ?>
     <div class="row mt-2">
         <div class="col-6">
-            <label for="worker_select">Filter zamestnanec</label>
+            <label for="worker_select" class="ms-4">Filter zamestnanec</label>
             <select id="worker_select" onchange="reloadFilter()">
                 <option value="0">Všetci</option>
                 <?php
@@ -64,7 +64,7 @@ include "message_bar.php";
     </div>
     <div class="row mt-1 d-none d-xxl-flex">
         <div class="col-6">
-            <form method="get" action="index.php">
+            <form method="get" action="overview.php">
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-xxl-6 col-10 col-xxl-8">
@@ -81,7 +81,7 @@ include "message_bar.php";
     </div>
     <div class="row mt-1 d-xxl-none">
         <div class="col-12">
-            <form method="get" action="index.php">
+            <form method="get" action="overview.php">
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-12">
@@ -96,6 +96,23 @@ include "message_bar.php";
                     </div>
                 </div>
             </form>
+        </div>
+    </div>
+    <div class="row mt-1">
+        <div class="col-md-3">
+            <table class="table table-sm table-responsive">
+                <tr>
+                    <th>Ísť na</th>
+                </tr>
+                <tbody>
+                <?php foreach ($workers as $worker){ ?>
+                    <tr>
+                        <td><a href="#worker_<?= $worker->id ?>"><?= $worker->GetFullName() ?></a> </td>
+                    </tr>
+                <?php
+                }?>
+                </tbody>
+            </table>
         </div>
     </div>
     <div class="row">
@@ -138,9 +155,9 @@ include "message_bar.php";
                     }
 
                     ?>
-                    <div class="table-row table-row-index row worker_<?= $worker->id ?> worker_name">
-                        <div class="col-xxl-1"><strong><?= $worker->GetFullName() ?></strong></div>
-                        <div class="col"><a href="month_view.php?id=<?= $worker->id ?>&m=<?= $year ?>-<?= $month ?>"
+                    <div class="table-row table-row-index row worker_<?= $worker->id ?> worker_name" id="worker_<?= $worker->id ?>">
+                        <div class="col-3"><strong><?= $worker->GetFullName() ?></strong></div>
+                        <div class="col-6"><a href="month_view.php?id=<?= $worker->id ?>&m=<?= $year ?>-<?= $month ?>"
                                             class="btn btn-primary">Mesačný prehľad</a></div>
                     </div>
                     <?php
