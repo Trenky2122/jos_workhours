@@ -187,7 +187,7 @@ include "message_bar.php";
                             <div class="col-2 d-xxl-none mb-xxl-0 mb-1"><strong>do:</strong></div>
                             <div class="col-xxl-1 col-4 mb-xxl-0 mb-1"><?= substr($workerData["break_end"], 0, 5) ?></div>
                             <div class="col-6 d-xxl-none mb-xxl-0 mb-1"><strong>Čas celkom:</strong></div>
-                            <div class="col-6 d-xxl-none mb-xxl-0 mb-1"><?= $service->CalculateDayTime($workerData["begin_time"], $workerData["end_time"], $workerData["break_begin"], $workerData["break_end"]) ?></div>
+                            <div class="col-xxl-1 col-6 mb-xxl-0 mb-1"><?= $service->CalculateDayTime($workerData["begin_time"], $workerData["end_time"], $workerData["break_begin"], $workerData["break_end"]) ?></div>
                             <div class="col-12 d-xxl-none"><strong>Popis práce:</strong></div>
                             <div class="col-xxl-2 col-12 mb-xxl-0 mb-1"><?= $workerData["description"] ?></div>
                             <div class="col-xxl-2 col-12 d-none d-xxl-block">
