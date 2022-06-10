@@ -865,8 +865,15 @@ class Service
             $worker_workday["work_day_date"] = $date;
             $worker_workday["description"] = "";
             $worker_workday["done"] = true;
+            $first = true;
             foreach ($dayEntries as $dayEntry){
-                $worker_workday["description"] .= " ".$dayEntry["description"];
+                if($first){
+                    $first = false;
+                }
+                else{
+                    $worker_workday["description"] .= " | ";
+                }
+                $worker_workday["description"] .= $dayEntry["description"];
             }
             usort($dayEntries, "cmp");
             $worker_workday["begin_time"] = date("H:i:s", strtotime($dayEntries[0]["timeInterval"]["start"]));
