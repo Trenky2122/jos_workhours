@@ -2,6 +2,7 @@
 $active = "settings";
 include "header.php";
 include "message_bar.php";
+//test
 ?>
 
 <div style="padding-left: 1em">
