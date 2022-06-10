@@ -17,14 +17,6 @@ include "message_bar.php";
             </div>
             <div class="row mb-1">
                 <div class="col-3">
-                    <label for="admin_pwd">Admin heslo:</label>
-                </div>
-                <div class="col-6">
-                    <input type="password" name="admin_password" id="admin_pwd">
-                </div>
-            </div>
-            <div class="row mb-1">
-                <div class="col-3">
                     <input required type="submit" class="btn btn-primary" value="Uložiť">
                 </div>
             </div>

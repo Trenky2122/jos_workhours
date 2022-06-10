@@ -1,15 +1,10 @@
 <?php
-if(!isset($_POST["admin_password"])||!isset($_POST["project_id"])||!isset($_POST["submit"])){
+if(!isset($_POST["project_id"])||!isset($_POST["submit"])){
     header("Location: projects.php?err=1");
     die();
 }
 include_once "service.php";
 $service = new Service();
-if(!$service->WorkerCorrectPassword(-1, $_POST["admin_password"])){
-    header("Location: projects.php?err=2");
-    die();
-}
-
 if($_POST["submit"]=="Aktivovať"){
     if($service->EnableProject($_POST["project_id"])){
         header("Location: projects.php?succ=1");

@@ -46,8 +46,7 @@ if(isset($_GET["to"])&&!empty($_GET["to"]))
                     <td style="border-bottom: black solid 1px; border-top: black solid 2px">
                         <form action="project_action.php" method="post">
                             <input type="hidden" value="<?=$project->id?>" name="project_id">
-                            <input type="submit" name="submit" class="mb-1" value="<?=$project->active?"Deaktivovať":"Aktivovať"?>"><br>
-                            <input type="password" name="admin_password">
+                            <input type="submit" name="submit" class="mb-1 btn btn-<?=$project->active?"danger":"success"?>" value="<?=$project->active?"Deaktivovať":"Aktivovať"?>"><br>
                         </form>
                     </td>
                 </tr>
