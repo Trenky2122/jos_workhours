@@ -870,7 +870,7 @@ class Service
                 if($first){
                     $first = false;
                 }
-                else{
+                else if($dayEntry["description"]){
                     $worker_workday["description"] .= " | ";
                 }
                 $worker_workday["description"] .= $dayEntry["description"];
