@@ -9,6 +9,7 @@ $worker_id = $_SESSION["user_id"];
 if(isset($_GET["id"])){
     $worker_id = $_GET["id"];
 }
+$show_clockify_ticket_text = isset($_GET["show_ticket_text"])&&$_GET["show_ticket_text"];
 $worker = $service->GetWorkerWithId($worker_id);
 $worker_name = $worker->GetFullName();
 $year = date("Y");
@@ -47,7 +48,8 @@ else{
         $clockify_data = json_encode($entries);
     }
 }
-
+if(!$show_clockify_ticket_text)
+    $entries = $service->HideClockifyEntriesDescriptionText($entries);
 foreach($done_days as $date=>$day){
     if($day["break_end"] == null){
         $entries[] = $service->DayFromDbToClockifyFormat($day["work_day_date"], $day["begin_time"], $day["end_time"], $day["description"], $day["id"]);
@@ -89,7 +91,17 @@ include "message_bar.php";
             </form>
         </div>
     </div>
-
+    <div class="row noprint mb-1">
+        <div class="col">
+            <?php
+            $query_array_with_alternate_ticket_showing = $_GET;
+            $query_array_with_alternate_ticket_showing["show_ticket_text"] = !$show_clockify_ticket_text;
+            ?>
+            <a href="month_view.php?<?=http_build_query($query_array_with_alternate_ticket_showing)?>" class="btn btn-primary">
+                <?=$show_clockify_ticket_text?"Skryť text clockify ticketov":"Zobraziť celý text clockify ticketov"?>
+            </a>
+        </div>
+    </div>
     <div class="row">
         <div class="col-12">
             <table id="example" class="export_table">

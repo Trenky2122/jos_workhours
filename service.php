@@ -907,4 +907,24 @@ class Service
         }
         return $worker_workdays;
     }
+
+    public function HideClockifyEntriesDescriptionText($entries){
+        foreach ($entries as $key=>$entry){
+            $entry_description = $entry["description"];
+            $description_split_by_tickets = explode(", ", $entry_description);
+            $new_description = "";
+            $first = true;
+            foreach ($description_split_by_tickets as $ticket){
+                $ticketNr = explode(": ", $ticket)[0];
+                if(!isset($ticketNr[0]) || !is_numeric($ticketNr[0]))
+                    continue; // not a valid ticket description, probably caused by ', ' in ticket description
+                if(!$first)
+                    $new_description .= ", ";
+                $first = false;
+                $new_description .= $ticketNr;
+            }
+            $entries[$key]["description"] = $new_description;
+        }
+        return $entries;
+    }
 }

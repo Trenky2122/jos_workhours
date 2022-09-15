@@ -15,7 +15,7 @@ function recalculateHours(element_id) {
         }
         document.getElementById(element_id).innerHTML = time;
     } else {
-        document.getElementById(element_id).innerHTML = "0:00";
+        document.getElementById(element_id).innerHTML = "00:00";
     }
     return breakOk && begin_time<=end_time && (break_begin == '' || (begin_time<=break_begin && end_time>=break_end));
 }
@@ -74,4 +74,12 @@ function verifyProjectInputs(classnameProjects, valueId, collapse, done){
         return false;
     }
     return true;
+}
+
+function setAllDay1Project(projectInputId, valueId, otherProjectsClass){
+    document.querySelectorAll("."+otherProjectsClass).forEach(input => {
+        input.value = "00:00";
+    })
+    let value = document.getElementById(valueId).innerHTML;
+    document.getElementById(projectInputId).value = value;
 }
