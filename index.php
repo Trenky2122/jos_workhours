@@ -166,7 +166,7 @@ include "message_bar.php";
                                                        id="project_<?= $worker->id . "_" . $day->day_of_week . "_" . $project->id ?>"
                                                        value="<?= $projectData[$project->id] ?? null ?>" <?= $closed ? "disabled" : "" ?>>
                                                 <button type="button" style="border: none" title="Robil som len na tomto projekte" onclick="setAllDay1Project('project_<?= $worker->id . "_" . $day->day_of_week . "_" . $project->id ?>',
-                                                        'total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>', 'projects_<?= $day->day ?>')">&#128504;</button>
+                                                        'total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>', 'projects_<?= $day->day ?>')">✓</button>
                                             </div>
                                         </div>
                                         <?php
@@ -188,7 +188,8 @@ include "message_bar.php";
                                            name="projects_m[<?= $project->id ?>]"
                                            id="project_m_<?= $worker->id . "_" . $day->day_of_week . "_" . $project->id ?>"
                                            value="<?= $projectData[$project->id] ?? null ?>" <?= $closed ? "disabled" : "" ?>>
-                                    <button type="button">&#128504;</button>
+                                    <button type="button" onclick="setAllDay1Project('project_m_<?= $worker->id . "_" . $day->day_of_week . "_" . $project->id ?>',
+                                            'total_hrs_<?= $worker->id . "_" . $day->day_of_week ?>', 'projects_m_<?= $day->day ?>')">✓</button>
                                 </div>
                             </div>
                             <?php
