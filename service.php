@@ -908,7 +908,10 @@ class Service
         return $worker_workdays;
     }
 
-    public function HideClockifyEntriesDescriptionText($entries){
+    public function HideClockifyEntriesDescriptionText($entries): ?array
+    {
+        if($entries == null)
+            return null;
         foreach ($entries as $key=>$entry){
             $entry_description = $entry["description"];
             $description_split_by_tickets = explode(", ", $entry_description);
