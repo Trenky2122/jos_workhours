@@ -715,6 +715,8 @@ class Service
 
         if($clockify_data) {
             $clockify_entries = json_decode($clockify_data, true);
+            if($clockify_entries == null)
+                $clockify_entries = array();
             $totalInterval = new DateInterval("PT0H");
             foreach ($clockify_entries as $entry) {
                 if (isset($entry["timeInterval"]["duration"]) && $entry["timeInterval"]["duration"] != null) {
@@ -911,7 +913,7 @@ class Service
     public function HideClockifyEntriesDescriptionText($entries): ?array
     {
         if($entries == null)
-            return null;
+            return array();
         foreach ($entries as $key=>$entry){
             $entry_description = $entry["description"];
             $description_split_by_tickets = explode(", ", $entry_description);
