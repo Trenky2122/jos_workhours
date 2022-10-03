@@ -221,7 +221,7 @@ include "message_bar.php";
                 <form action="submit_close_month.php" method="post">
                     <input type="hidden" value="<?= $worker_id ?>" name="worker_id">
                     <input type="hidden" value="<?= $year."-".$month ?>" name="month">
-                    <input type="hidden" value='<?= $clockify_data ?>' name="clockify_data">
+                    <textarea class="d-none" name="clockify_data"><?= $clockify_data ?></textarea>
                     <input class="btn btn-primary" name="submit" value="Uzavrieť mesiac" type="submit">
                 </form>
             </div>
@@ -264,7 +264,7 @@ include "message_bar.php";
                 <form action="submit_close_month_correction.php" method="post">
                     <input type="hidden" value="<?= $worker_id ?>" name="worker_id">
                     <input type="hidden" value="<?= $year."-".$month ?>" name="month">
-                    <input type="hidden" value='<?= $clockify_data ?>' name="clockify_data">
+                    <textarea class="d-none" name="clockify_data"><?= $clockify_data ?></textarea>
                     <input class="btn btn-primary" name="submit" value="Uzavrieť mesiac (oprava)" type="submit">
                 </form>
             </div>
