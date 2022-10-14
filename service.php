@@ -723,7 +723,7 @@ class Service
                     $totalInterval = $this->AddTimeIntervals($totalInterval, new DateInterval($entry["timeInterval"]["duration"]));
                 }
             }
-            $clockify_total = ($totalInterval->d * 24 + $totalInterval->h) . ":" . $totalInterval->i . ":" . $totalInterval->s;
+            $clockify_total = ($totalInterval->d * 24 + $totalInterval->h) . ":" .($totalInterval->i<10?"0":""). $totalInterval->i . ":" . $totalInterval->s;
             if (isset($retval["Partners"])) {
                 $retval["Partners"] = $this->CalculateTotalTime(array($retval["Partners"], $clockify_total));
             } else {
